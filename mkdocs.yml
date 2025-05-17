@@ -1,0 +1,107 @@
+site_name: Software Architecture Guide
+site_description: Comprehensive guide to modern software architecture principles and patterns
+site_author: Your Team
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - footnotes
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mermaid2
+  - i18n:
+      default_language: en
+      languages:
+        en: English
+        es: Español
+      nav_translations:
+        es:
+          Home: Inicio
+          "SOLID Principles": "Principios SOLID"
+          Overview: "Visión general"
+          "Design Patterns": "Patrones de Diseño"
+          "Architectural Styles": "Estilos Arquitectónicos"
+          "Domain-Driven Design": "Diseño Dirigido por el Dominio"
+          "Implementation Examples": "Ejemplos de Implementación"
+          "Best Practices": "Mejores Prácticas"
+          "Team Adoption": "Adopción en Equipo"
+
+# Configuration for the language selector
+extra:
+  alternate:
+    - name: English
+      link: /en/
+      lang: en
+    - name: Español
+      link: /es/
+      lang: es
+
+nav:
+  - Home: en/index.md
+  - SOLID Principles:
+      - Overview: en/solid/index.md
+      - Single Responsibility: en/solid/single-responsibility.md
+      - Open-Closed: en/solid/open-closed.md
+      - Liskov Substitution: en/solid/liskov-substitution.md
+      - Interface Segregation: en/solid/interface-segregation.md
+      - Dependency Inversion: en/solid/dependency-inversion.md
+  - Design Patterns:
+      - Overview: en/design-patterns/index.md
+      - Creational Patterns: en/design-patterns/creational.md
+      - Structural Patterns: en/design-patterns/structural.md
+      - Behavioral Patterns: en/design-patterns/behavioral.md
+  - Architectural Styles:
+      - Overview: en/architecture/index.md
+      - Layered Architecture: en/architecture/layered.md
+      - Microservices: 
+          - Overview: en/architecture/microservices/index.md
+          - Design Principles: en/architecture/microservices/principles.md
+          - Communication Patterns: en/architecture/microservices/communication.md
+          - Deployment Strategies: en/architecture/microservices/deployment.md
+  - Domain-Driven Design:
+      - Overview: en/ddd/index.md
+      - Ubiquitous Language: en/ddd/ubiquitous-language.md
+      - Bounded Contexts: en/ddd/bounded-contexts.md
+      - Entities and Value Objects: en/ddd/entities-value-objects.md
+      - Aggregates: en/ddd/aggregates.md
+      - Repositories: en/ddd/repositories.md
+      - Domain Services: en/ddd/domain-services.md
+      - Application Services: en/ddd/application-services.md
+  - Implementation Examples:
+      - Python Backend: en/examples/python-backend.md
+      - TypeScript Backend: en/examples/typescript-backend.md
+  - Best Practices:
+      - Code Organization: en/best-practices/code-organization.md
+      - Configuration Management: en/best-practices/configuration-management.md
+      - Testing Strategies: en/best-practices/testing.md
+  - Team Adoption:
+      - Architecture Decision Records: en/team-adoption/adrs.md
+      - Code Reviews: en/team-adoption/code-reviews.md
+      - Knowledge Sharing: en/team-adoption/knowledge-sharing.md 

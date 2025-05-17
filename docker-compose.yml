@@ -1,0 +1,14 @@
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/docs
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    command: ["mkdocs", "serve", "--dev-addr=0.0.0.0:8000", "--livereload"] 
