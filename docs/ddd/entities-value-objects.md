@@ -1,123 +1,222 @@
-# Entities and Value Objects
+# Entidades y Objetos de Valor
 
-Entities and Value Objects are the basic building blocks of a domain model in Domain-Driven Design. Understanding the distinction between these two types of objects is fundamental to creating effective domain models.
+Las Entidades y los Objetos de Valor son los bloques básicos de construcción de un modelo de dominio en el Diseño Dirigido por el Dominio (DDD). Entender la distinción entre estos dos tipos de objetos es fundamental para crear modelos de dominio efectivos.
 
-## Entities
+## Visión General de los Conceptos
 
-Entities are objects that have a unique identity that persists over time, regardless of changes to their attributes.
-
-### Key Characteristics of Entities
-
-- **Identity**: An entity has a unique identifier that distinguishes it from all other instances.
-- **Mutable**: Entities can change their attributes over time while maintaining their identity.
-- **Lifecycle**: Entities have a lifecycle - they're created, they may change, and they might be archived or deleted.
-- **Equals by ID**: Two entities with the same identity are considered the same entity, even if they have different attribute values.
-
-### Examples of Entities
-
-- A `User` in a system (identified by user ID)
-- An `Order` in an e-commerce system (identified by order number)
-- A `BankAccount` (identified by account number)
-- A `Product` in inventory (identified by SKU)
-
-### Implementing Entities in Python
-
-```python
-class User:
-    def __init__(self, user_id, name, email):
-        self.id = user_id  # Identity field
-        self.name = name
-        self.email = email
-        
-    def change_name(self, new_name):
-        self.name = new_name
-        
-    def change_email(self, new_email):
-        self.email = new_email
-        
-    def __eq__(self, other):
-        if not isinstance(other, User):
-            return False
-        return self.id == other.id  # Equality by ID, not attributes
-        
-    def __hash__(self):
-        return hash(self.id)  # Hash based on identity
+```mermaid
+classDiagram
+    class Entidad {
+        +identity: ID
+        +atributos mutables
+        +comportamiento()
+    }
+    
+    class ObjetoDeValor {
+        +atributos inmutables
+        +comportamiento()
+    }
+    
+    class Usuario {
+        +id: UUID
+        +nombre: String
+        +email: Email
+        +cambiarNombre(nuevoNombre)
+        +cambiarEmail(nuevoEmail)
+    }
+    
+    class Email {
+        +direccion: String
+        +validar()
+    }
+    
+    Entidad <|-- Usuario
+    ObjetoDeValor <|-- Email
+    Usuario --> Email
+    
+    style Entidad fill:#f9d77e,stroke:#333,stroke-width:2px
+    style ObjetoDeValor fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style Usuario fill:#84b1ed,stroke:#333,stroke-width:2px
+    style Email fill:#84b1ed,stroke:#333,stroke-width:2px
 ```
 
-Note how:
-- The `id` field holds the entity's identity
-- Equality (`__eq__`) is based on identity, not attributes
-- Methods allow for changing attributes while identity remains constant
+## Entidades
 
-## Value Objects
+Las Entidades son objetos que tienen una identidad única que persiste en el tiempo, independientemente de los cambios en sus atributos.
 
-Value Objects are objects that have no conceptual identity - they are defined solely by their attributes.
+### Características Principales de las Entidades
 
-### Key Characteristics of Value Objects
+- **Identidad**: Una entidad tiene un identificador único que la distingue de todas las demás instancias.
+- **Mutabilidad**: Las entidades pueden cambiar sus atributos a lo largo del tiempo manteniendo su identidad.
+- **Ciclo de vida**: Las entidades tienen un ciclo de vida - se crean, pueden cambiar y pueden ser archivadas o eliminadas.
+- **Igualdad por ID**: Dos entidades con la misma identidad se consideran la misma entidad, incluso si tienen valores de atributos diferentes.
 
-- **No Identity**: Value objects don't have an identifier field.
-- **Immutable**: Once created, value objects should not change (any "change" creates a new instance).
-- **Equality by Attributes**: Two value objects with the same attributes are considered equal.
-- **Replaceable**: Value objects can be freely replaced with others having the same attributes.
-- **Often Used to Measure, Quantify or Describe**: Value objects often represent concepts like money, dates, addresses.
+### Ejemplos de Entidades
 
-### Examples of Value Objects
+- Un `Usuario` en un sistema (identificado por ID de usuario)
+- Un `Pedido` en un sistema de comercio electrónico (identificado por número de pedido)
+- Una `CuentaBancaria` (identificada por número de cuenta)
+- Un `Producto` en inventario (identificado por SKU)
 
-- An `EmailAddress` (defined by its string representation)
-- A `Money` amount (defined by amount and currency)
-- A `DateRange` (defined by start and end dates)
-- A `Address` (defined by street, city, zip, etc.)
+### Implementando Entidades en Python
 
-### Implementing Value Objects in Python
+```python
+class Usuario:
+    def __init__(self, usuario_id, nombre, email):
+        self.id = usuario_id  # Campo de identidad
+        self.nombre = nombre
+        self.email = email
+        
+    def cambiar_nombre(self, nuevo_nombre):
+        self.nombre = nuevo_nombre
+        
+    def cambiar_email(self, nuevo_email):
+        self.email = nuevo_email
+        
+    def __eq__(self, other):
+        if not isinstance(other, Usuario):
+            return False
+        return self.id == other.id  # Igualdad por ID, no por atributos
+        
+    def __hash__(self):
+        return hash(self.id)  # Hash basado en identidad
+```
+
+Observa cómo:
+- El campo `id` contiene la identidad de la entidad
+- La igualdad (`__eq__`) se basa en la identidad, no en los atributos
+- Los métodos permiten cambiar atributos mientras la identidad se mantiene constante
+
+## Objetos de Valor
+
+Los Objetos de Valor son objetos que no tienen una identidad conceptual - se definen únicamente por sus atributos.
+
+### Características Principales de los Objetos de Valor
+
+- **Sin Identidad**: Los objetos de valor no tienen un campo identificador.
+- **Inmutabilidad**: Una vez creados, los objetos de valor no deben cambiar (cualquier "cambio" crea una nueva instancia).
+- **Igualdad por Atributos**: Dos objetos de valor con los mismos atributos se consideran iguales.
+- **Reemplazables**: Los objetos de valor pueden ser reemplazados libremente por otros que tengan los mismos atributos.
+- **A menudo se utilizan para medir, cuantificar o describir**: Los objetos de valor suelen representar conceptos como dinero, fechas, direcciones.
+
+```mermaid
+flowchart LR
+    subgraph "Entidad Usuario"
+        id[id: 12345]
+        nombre[nombre: Ana]
+        email[email: Email]
+    end
+    
+    subgraph "Objeto de Valor Email"
+        direccion[direccion: ana@ejemplo.com]
+    end
+    
+    email --> direccion
+    
+    style id fill:#f9d77e,stroke:#333,stroke-width:2px
+    style nombre fill:#f9d77e,stroke:#333,stroke-width:2px
+    style email fill:#f9d77e,stroke:#333,stroke-width:2px
+    style direccion fill:#a3c9a8,stroke:#333,stroke-width:2px
+```
+
+### Ejemplos de Objetos de Valor
+
+- Una `DireccionEmail` (definida por su representación de cadena)
+- Una cantidad de `Dinero` (definida por cantidad y moneda)
+- Un `RangoDeFechas` (definido por fechas de inicio y fin)
+- Una `Direccion` (definida por calle, ciudad, código postal, etc.)
+
+### Implementando Objetos de Valor en Python
 
 ```python
 from dataclasses import dataclass
 
-@dataclass(frozen=True)  # frozen=True makes it immutable
-class Money:
-    amount: float
-    currency: str
+@dataclass(frozen=True)  # frozen=True lo hace inmutable
+class Dinero:
+    cantidad: float
+    moneda: str
     
     def __post_init__(self):
-        # Validation logic (in a real implementation, we'd use a
-        # different approach since frozen=True prevents attribute changes)
-        if self.amount < 0:
-            object.__setattr__(self, "amount", 0)
+        # Lógica de validación (en una implementación real, usaríamos
+        # un enfoque diferente ya que frozen=True impide cambios de atributos)
+        if self.cantidad < 0:
+            object.__setattr__(self, "cantidad", 0)
             
-    def add(self, other):
-        if self.currency != other.currency:
-            raise ValueError("Cannot add different currencies")
-        # Create a new instance rather than modifying this one
-        return Money(self.amount + other.amount, self.currency)
+    def sumar(self, otro):
+        if self.moneda != otro.moneda:
+            raise ValueError("No se pueden sumar monedas diferentes")
+        # Crear una nueva instancia en lugar de modificar esta
+        return Dinero(self.cantidad + otro.cantidad, self.moneda)
         
-    def multiply(self, factor):
-        # Again, creates a new instance
-        return Money(self.amount * factor, self.currency)
+    def multiplicar(self, factor):
+        # De nuevo, crea una nueva instancia
+        return Dinero(self.cantidad * factor, self.moneda)
 ```
 
-Note how:
-- We use `@dataclass(frozen=True)` to create an immutable object
-- The `add` and `multiply` methods return new instances rather than modifying the existing one
-- There's no identity field
+Observa cómo:
+- Usamos `@dataclass(frozen=True)` para crear un objeto inmutable
+- Los métodos `sumar` y `multiplicar` devuelven nuevas instancias en lugar de modificar la existente
+- No hay campo de identidad
 
-## When to Use Entities vs. Value Objects
+## Comparación de Comportamiento
 
-Use an **Entity** when:
-- The object needs to be tracked over time
-- The object has a distinct identity in the domain
-- The same object can change over time while remaining "the same"
-- You need to maintain history of the object
+```mermaid
+graph TD
+    subgraph "Entidad: Usuario"
+        E1[id: 1<br>nombre: 'Ana'<br>email: 'ana@ejemplo.com']
+        E2[id: 1<br>nombre: 'Ana López'<br>email: 'ana@ejemplo.com']
+        
+        E1 -- cambiar nombre --> E2
+        
+        comp1{{"E1 == E2"}}
+        
+        E1 -.-> comp1
+        E2 -.-> comp1
+        comp1 -.-> result1[true]
+    end
+    
+    subgraph "Objeto de Valor: Email"
+        V1[email: 'info@empresa.com']
+        V2[email: 'info@empresa.com']
+        V3[email: 'contacto@empresa.com']
+        
+        comp2{{"V1 == V2"}}
+        comp3{{"V1 == V3"}}
+        
+        V1 -.-> comp2
+        V2 -.-> comp2
+        V1 -.-> comp3
+        V3 -.-> comp3
+        
+        comp2 -.-> result2[true]
+        comp3 -.-> result3[false]
+    end
+    
+    style E1 fill:#f9d77e,stroke:#333,stroke-width:2px
+    style E2 fill:#f9d77e,stroke:#333,stroke-width:2px
+    style V1 fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style V2 fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style V3 fill:#a3c9a8,stroke:#333,stroke-width:2px
+```
 
-Use a **Value Object** when:
-- The object is defined entirely by its attributes
-- Equality is determined by comparing all attributes
-- The concept is immutable in the domain
-- Replacing it with another identical instance wouldn't matter
-- It represents a descriptive aspect of the domain with no identity
+## Cuándo Usar Entidades vs. Objetos de Valor
 
-## Practical Example: E-commerce Domain
+Usa una **Entidad** cuando:
+- El objeto necesita ser rastreado a lo largo del tiempo
+- El objeto tiene una identidad distinta en el dominio
+- El mismo objeto puede cambiar con el tiempo mientras sigue siendo "el mismo"
+- Necesitas mantener un historial del objeto
 
-Let's see how entities and value objects work together in an e-commerce scenario:
+Usa un **Objeto de Valor** cuando:
+- El objeto se define enteramente por sus atributos
+- La igualdad se determina comparando todos los atributos
+- El concepto es inmutable en el dominio
+- Reemplazarlo con otra instancia idéntica no importaría
+- Representa un aspecto descriptivo del dominio sin identidad
+
+## Ejemplo Práctico: Dominio de Comercio Electrónico
+
+Veamos cómo las entidades y los objetos de valor trabajan juntos en un escenario de comercio electrónico:
 
 ```python
 from dataclasses import dataclass
@@ -125,95 +224,141 @@ from typing import List
 from datetime import datetime
 from uuid import UUID, uuid4
 
-# Value Objects
+# Objetos de Valor
 @dataclass(frozen=True)
-class Address:
-    street: str
-    city: str
-    state: str
-    postal_code: str
-    country: str
+class Direccion:
+    calle: str
+    ciudad: str
+    estado: str
+    codigo_postal: str
+    pais: str
 
 @dataclass(frozen=True)
-class Money:
-    amount: float
-    currency: str = "USD"
+class Dinero:
+    cantidad: float
+    moneda: str = "EUR"
 
 @dataclass(frozen=True)
-class OrderItem:
-    product_id: UUID
-    quantity: int
-    price_per_unit: Money
+class LineaPedido:
+    producto_id: UUID
+    cantidad: int
+    precio_unitario: Dinero
     
-    def total_price(self) -> Money:
-        return Money(self.price_per_unit.amount * self.quantity, 
-                    self.price_per_unit.currency)
+    def precio_total(self) -> Dinero:
+        return Dinero(self.precio_unitario.cantidad * self.cantidad, 
+                    self.precio_unitario.moneda)
 
-# Entity
-class Order:
-    def __init__(self, order_id: UUID, customer_id: UUID, 
-                 shipping_address: Address):
-        self.id = order_id
-        self.customer_id = customer_id
-        self.shipping_address = shipping_address
-        self.items: List[OrderItem] = []
-        self.created_at = datetime.now()
-        self.status = "CREATED"
+# Entidad
+class Pedido:
+    def __init__(self, pedido_id: UUID, cliente_id: UUID, 
+                 direccion_envio: Direccion):
+        self.id = pedido_id
+        self.cliente_id = cliente_id
+        self.direccion_envio = direccion_envio
+        self.lineas: List[LineaPedido] = []
+        self.fecha_creacion = datetime.now()
+        self.estado = "CREADO"
         
-    def add_item(self, item: OrderItem) -> None:
-        self.items.append(item)
+    def agregar_linea(self, linea: LineaPedido) -> None:
+        self.lineas.append(linea)
         
-    def total_price(self) -> Money:
-        if not self.items:
-            return Money(0)
+    def precio_total(self) -> Dinero:
+        if not self.lineas:
+            return Dinero(0)
             
-        # Get the currency from the first item
-        currency = self.items[0].price_per_unit.currency
-        total = sum(item.total_price().amount for item in self.items)
-        return Money(total, currency)
+        # Obtener la moneda del primer ítem
+        moneda = self.lineas[0].precio_unitario.moneda
+        total = sum(linea.precio_total().cantidad for linea in self.lineas)
+        return Dinero(total, moneda)
         
-    def ship(self) -> None:
-        if self.status != "CREATED":
-            raise ValueError(f"Cannot ship order with status {self.status}")
-        self.status = "SHIPPED"
+    def enviar(self) -> None:
+        if self.estado != "CREADO":
+            raise ValueError(f"No se puede enviar un pedido con estado {self.estado}")
+        self.estado = "ENVIADO"
 
-# Usage
-customer_id = uuid4()
-order_id = uuid4()
-shipping_address = Address("123 Main St", "Anytown", "CA", "12345", "USA")
+# Uso
+cliente_id = uuid4()
+pedido_id = uuid4()
+direccion_envio = Direccion("Calle Principal 123", "Madrid", "Madrid", "28001", "España")
 
-# Create Order entity
-order = Order(order_id, customer_id, shipping_address)
+# Crear entidad Pedido
+pedido = Pedido(pedido_id, cliente_id, direccion_envio)
 
-# Create and add OrderItem value objects
-item1 = OrderItem(uuid4(), 2, Money(29.99))
-item2 = OrderItem(uuid4(), 1, Money(49.99))
+# Crear y agregar objetos de valor LineaPedido
+linea1 = LineaPedido(uuid4(), 2, Dinero(29.99))
+linea2 = LineaPedido(uuid4(), 1, Dinero(49.99))
 
-order.add_item(item1)
-order.add_item(item2)
+pedido.agregar_linea(linea1)
+pedido.agregar_linea(linea2)
 
-print(f"Order total: ${order.total_price().amount:.2f}")
+print(f"Total del pedido: {pedido.precio_total().cantidad:.2f} {pedido.precio_total().moneda}")
 ```
 
-This example shows:
-- `Order` as an entity with identity and lifecycle
-- `Address`, `Money`, and `OrderItem` as value objects (immutable, defined by their attributes)
-- How entities and value objects work together in a domain model
+Este ejemplo muestra:
+- `Pedido` como una entidad con identidad y ciclo de vida
+- `Direccion`, `Dinero` y `LineaPedido` como objetos de valor (inmutables, definidos por sus atributos)
+- Cómo las entidades y los objetos de valor trabajan juntos en un modelo de dominio
 
-## Domain Modeling Best Practices
+```mermaid
+classDiagram
+    class Pedido {
+        +id: UUID
+        +cliente_id: UUID
+        +direccion_envio: Direccion
+        +lineas: List~LineaPedido~
+        +fecha_creacion: datetime
+        +estado: string
+        +agregar_linea(linea)
+        +precio_total(): Dinero
+        +enviar()
+    }
+    
+    class Direccion {
+        +calle: string
+        +ciudad: string
+        +estado: string
+        +codigo_postal: string
+        +pais: string
+    }
+    
+    class Dinero {
+        +cantidad: float
+        +moneda: string
+        +sumar(otro): Dinero
+        +multiplicar(factor): Dinero
+    }
+    
+    class LineaPedido {
+        +producto_id: UUID
+        +cantidad: int
+        +precio_unitario: Dinero
+        +precio_total(): Dinero
+    }
+    
+    Pedido -- Direccion
+    Pedido -- LineaPedido
+    LineaPedido -- Dinero
+    
+    style Pedido fill:#f9d77e,stroke:#333,stroke-width:2px
+    style Direccion fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style Dinero fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style LineaPedido fill:#a3c9a8,stroke:#333,stroke-width:2px
+```
 
-When modeling with entities and value objects:
+## Mejores Prácticas de Modelado de Dominio
 
-1. **Start with behavior, not data**: Focus on what the object does in the domain, not just what data it holds.
+Al modelar con entidades y objetos de valor:
 
-2. **Be explicit about identity**: For entities, clearly identify what makes them unique in the domain.
+1. **Comienza con el comportamiento, no con los datos**: Concéntrate en lo que hace el objeto en el dominio, no solo en qué datos contiene.
 
-3. **Make value objects immutable**: This ensures they behave correctly and can be shared safely.
+2. **Sé explícito sobre la identidad**: Para las entidades, identifica claramente qué las hace únicas en el dominio.
 
-4. **Consider using factory methods**: For complex object creation logic, especially for value objects with validation.
+3. **Haz que los objetos de valor sean inmutables**: Esto asegura que se comporten correctamente y puedan compartirse de forma segura.
 
-5. **Encapsulate collections**: When an entity contains a collection, don't expose it directly; provide methods that control how items are added or removed.
+4. **Considera el uso de métodos de fábrica**: Para lógica de creación de objetos compleja, especialmente para objetos de valor con validación.
 
-6. **Use Value Objects for validation**: They can encapsulate and enforce domain rules about specific values.
+5. **Encapsula colecciones**: Cuando una entidad contiene una colección, no la expongas directamente; proporciona métodos que controlen cómo se agregan o eliminan elementos.
 
-By properly using entities and value objects, you create domain models that are both expressive and maintain their integrity as the application evolves. 
+6. **Usa objetos de valor para validación**: Pueden encapsular y hacer cumplir las reglas del dominio sobre valores específicos.
+
+Al utilizar correctamente entidades y objetos de valor, crearás modelos de dominio que son expresivos y mantienen su integridad a medida que la aplicación evoluciona. 

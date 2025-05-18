@@ -11,6 +11,44 @@ DDD cambia nuestro enfoque de las preocupaciones técnicas al dominio de negocio
 - Organizamos nuestro sistema alrededor de conceptos del dominio, no de capas técnicas
 - Aislamos la lógica compleja del dominio para mantenerla pura y mantenible
 
+## Visión General de DDD
+
+El siguiente diagrama muestra cómo se relacionan los conceptos clave de DDD:
+
+```mermaid
+graph TD
+    UL[Lenguaje Ubicuo] --> BC[Contextos Delimitados]
+    
+    subgraph "Modelo de Dominio"
+        BC --> |contiene| M[Modelo]
+        M --> |se compone de| E[Entidades]
+        M --> |se compone de| V[Objetos de Valor]
+        M --> |se compone de| A[Agregados]
+        M --> |se compone de| DS[Servicios de Dominio]
+        
+        A --> |contiene| E
+        A --> |contiene| V
+        
+        E --> |accedidos por| R[Repositorios]
+        A --> |accedidos por| R
+    end
+    
+    subgraph "Capa de Aplicación"
+        AS[Servicios de Aplicación] --> |usan| DS
+        AS --> |usan| R
+    end
+    
+    style UL fill:#f9d77e,stroke:#333,stroke-width:2px
+    style BC fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style M fill:#d3d3d3,stroke:#333,stroke-width:1px
+    style E fill:#84b1ed,stroke:#333,stroke-width:2px
+    style V fill:#84b1ed,stroke:#333,stroke-width:2px
+    style A fill:#84b1ed,stroke:#333,stroke-width:2px
+    style DS fill:#84b1ed,stroke:#333,stroke-width:2px
+    style R fill:#d998b3,stroke:#333,stroke-width:2px
+    style AS fill:#d998b3,stroke:#333,stroke-width:2px
+```
+
 ## ¿Por qué usar Diseño Dirigido por el Dominio?
 
 DDD es particularmente valioso cuando se construye software para dominios complejos donde:
@@ -31,6 +69,57 @@ Cuando se implementa eficazmente, DDD proporciona:
 - **Código más mantenible** que refleja conceptos del mundo real
 - **Evolución más sencilla** a medida que cambian las reglas de negocio
 
+## Estructura Típica de un Proyecto DDD
+
+Para aplicar eficazmente DDD, es importante organizar adecuadamente el código. A continuación se muestra una estructura de proyecto recomendada:
+
+```
+ecommerce-domain/
+├── src/
+│   ├── domain/                     # Núcleo de la lógica de dominio
+│   │   ├── model/                  # Entidades, Objetos de Valor, Agregados
+│   │   │   ├── cart/               # Agregado "Carrito"
+│   │   │   │   ├── Cart.py         # Entidad raíz del agregado
+│   │   │   │   ├── CartItem.py     # Entidad dentro del agregado
+│   │   │   │   └── CartId.py       # Objeto de valor para identificador
+│   │   │   ├── customer/           # Agregado "Cliente"
+│   │   │   ├── order/              # Agregado "Pedido"
+│   │   │   ├── product/            # Agregado "Producto"
+│   │   │   └── shared/             # Objetos de valor compartidos
+│   │   │       ├── Address.py
+│   │   │       ├── Money.py
+│   │   │       └── Email.py
+│   │   ├── service/                # Servicios de dominio
+│   │   │   ├── CartService.py
+│   │   │   └── OrderService.py
+│   │   ├── repository/             # Interfaces de repositorios
+│   │   │   ├── CartRepository.py
+│   │   │   └── OrderRepository.py
+│   │   └── event/                  # Eventos de dominio
+│   │       ├── CartCreated.py
+│   │       └── OrderPlaced.py
+│   │
+│   ├── application/                # Capa de aplicación
+│   │   ├── service/                # Servicios de aplicación
+│   │   │   ├── CartApplicationService.py
+│   │   │   └── OrderApplicationService.py
+│   │   ├── dto/                    # Objetos de transferencia de datos
+│   │   └── command/                # Comandos y manejadores
+│   │
+│   └── infrastructure/             # Implementaciones técnicas
+│       ├── persistence/            # Implementaciones de repositorios
+│       │   ├── sql/
+│       │   │   └── SQLCartRepository.py
+│       │   └── mongodb/
+│       ├── messaging/              # Implementación de mensajería
+│       └── api/                    # Controladores de API
+│
+└── tests/                          # Pruebas organizadas por capa/componente
+    ├── domain/
+    ├── application/
+    └── infrastructure/
+```
+
 ## Conceptos Clave de DDD
 
 DDD abarca varios conceptos clave que exploraremos en detalle:
@@ -42,6 +131,16 @@ DDD abarca varios conceptos clave que exploraremos en detalle:
 5. [**Repositorios**](repositories.md) - Métodos para recuperar y persistir objetos del dominio
 6. [**Servicios de Dominio**](domain-services.md) - Operaciones que no pertenecen naturalmente a las entidades
 7. [**Servicios de Aplicación**](application-services.md) - Orquestación de objetos de dominio para realizar casos de uso
+
+## DDD y Arquitectura
+
+DDD no especifica una arquitectura específica, pero funciona bien con patrones como:
+
+- **Arquitectura de Capas**: Separar dominio, aplicación e infraestructura
+- **Arquitectura Hexagonal**: Aislar el dominio central con puertos y adaptadores
+- **Arquitectura Limpia (Clean Architecture)**: Mantener las reglas de negocio independientes de los detalles técnicos
+- **CQRS (Command Query Responsibility Segregation)**: Separar operaciones de lectura y escritura
+- **Event Sourcing**: Almacenar cambios de estado como secuencia de eventos
 
 ## DDD en la Práctica
 
