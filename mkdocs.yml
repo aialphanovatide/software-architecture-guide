@@ -53,12 +53,13 @@ nav:
       - Patrones de Comportamiento: design-patterns/behavioral.md
   - Estilos Arquitectónicos:
       - Visión general: architecture/index.md
-      - Arquitectura en Capas: architecture/layered.md
+      - Arquitectura en Capas: architecture/layered/layered.md
       - Microservicios: 
           - Visión general: architecture/microservices/index.md
           - Principios de Diseño: architecture/microservices/principles.md
           - Patrones de Comunicación: architecture/microservices/communication.md
           - Estrategias de Despliegue: architecture/microservices/deployment.md
+          - Estructura de Código: architecture/microservices/code-structure.md
   - Diseño Dirigido por el Dominio:
       - Visión general: ddd/index.md
       - Lenguaje Ubícuo: ddd/ubiquitous-language.md
@@ -68,14 +69,15 @@ nav:
       - Repositorios: ddd/repositories.md
       - Servicios de Dominio: ddd/domain-services.md
       - Servicios de Aplicación: ddd/application-services.md
-  - Ejemplos de Implementación:
-      - Backend en Python: examples/python-backend.md
-      - Backend en TypeScript: examples/typescript-backend.md
+      - Estructura de Código: ddd/code-structure.md
   - Mejores Prácticas:
       - Organización del Código: best-practices/code-organization.md
       - Gestión de Configuración: best-practices/configuration-management.md
       - Estrategias de Pruebas: best-practices/testing.md
+      - Documentación: best-practices/documentation.md
   - Adopción en Equipo:
       - Registros de Decisiones de Arquitectura: team-adoption/adrs.md
       - Revisiones de Código: team-adoption/code-reviews.md
-      - Compartición de Conocimiento: team-adoption/knowledge-sharing.md 
+      - Compartición de Conocimiento: team-adoption/knowledge-sharing.md
+      - Transición a Microservicios: team-adoption/microservices-transition.md
+      - Implementación de DDD: team-adoption/ddd-implementation.md 
