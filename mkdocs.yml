@@ -24,11 +24,20 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.collapse
     - navigation.indexes
     - navigation.top
     - content.code.copy
     - content.code.annotate
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - content.tooltips
+  icon:
+    repo: fontawesome/brands/github
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -43,16 +52,45 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - footnotes
   - toc:
       permalink: true
+      title: En esta página
 
 plugins:
   - search
   - mermaid2
+  - tags
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-github-handle
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/your-linkedin-handle
+  consent:
+    title: Uso de cookies
+    description: >- 
+      Utilizamos cookies para reconocer sus visitas y preferencias, así
+      como para medir la efectividad de la documentación y si los usuarios
+      encuentran lo que buscan. Con su consentimiento, nos está ayudando
+      a mejorar nuestra documentación.
+
+# URL para el repositorio de código
+repo_url: https://github.com/yourusername/software-architecture-guide
+repo_name: Software Architecture Guide
+edit_uri: edit/main/docs/
 
 nav:
   - Inicio: index.md
+  - Glosario: glossary.md
   - Módulo 1 - Fundamentos:
       - Principios SOLID:
           - Visión general: solid/index.md
