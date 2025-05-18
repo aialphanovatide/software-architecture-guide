@@ -47,7 +47,11 @@ Los microservicios representan una evolución del enfoque monolítico tradiciona
 
 ## Arquitectura de Referencia Completa
 
-El siguiente diagrama muestra una arquitectura de microservicios completa con todos los componentes clave:
+La arquitectura de microservicios involucra diversos componentes. Para mejor claridad, la dividiremos en dos diagramas.
+
+### Servicios Principales y Flujo de Datos
+
+Este diagrama muestra los servicios principales y cómo fluyen los datos entre ellos:
 
 ```mermaid
 graph TD
@@ -65,50 +69,78 @@ graph TD
     Product --> ProductDB[(BD Productos)]
     Payment --> PaymentDB[(BD Pagos)]
     
-    Order --> Product
-    Order --> User
-    Payment --> Order
-    Payment --> EventBus
+    Order -- Consulta productos --> Product
+    Order -- Verifica usuario --> User
+    Payment -- Procesa pago --> Order
+    Payment -- Publica evento --> EventBus
     
     EventBus[Event Bus / Message Queue] --> Notification
     Notification --> Email[Email Service]
     Notification --> SMS[SMS Service]
     Notification --> Push[Push Notifications]
     
+    style Client fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
+    style API fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
+    style Auth fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style User fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Order fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Product fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Payment fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Notification fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style EventBus fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
+    style Email fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
+    style SMS fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
+    style Push fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
+```
+
+### Infraestructura y Servicios de Soporte
+
+Este diagrama muestra la infraestructura común y cómo los servicios principales se conectan a ella:
+
+```mermaid
+graph TD
+    subgraph "Servicios Principales"
+        Services[Microservicios]
+        style Services fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    end
+    
     subgraph "Infraestructura Común"
         Config[Servicio de Configuración]
         Discovery[Servicio de Descubrimiento]
         Monitoring[Monitoreo y Logging]
         Tracing[Distributed Tracing]
+        
+        style Config fill:#f9d77e,stroke:#112d4e,stroke-width:2px
+        style Discovery fill:#a3c9a8,stroke:#112d4e,stroke-width:2px
+        style Monitoring fill:#84b1ed,stroke:#112d4e,stroke-width:2px
+        style Tracing fill:#d998b3,stroke:#112d4e,stroke-width:2px
     end
     
-    Auth -.-> Config
-    User -.-> Config
-    Order -.-> Config
-    Product -.-> Config
-    Payment -.-> Config
-    Notification -.-> Config
+    Services -. Obtiene configuración .-> Config
+    Services -. Registra servicios .-> Discovery
+    Services -. Envía métricas .-> Monitoring
+    Services -. Información de trazas .-> Tracing
+```
+
+Para ilustrar mejor las interacciones, a continuación se presenta un ejemplo de cómo un servicio específico utiliza la infraestructura de soporte:
+
+```mermaid
+graph LR
+    Order[Servicio de Pedidos] -. Lee configuración .-> Config[Servicio de Configuración]
+    Order -. Localiza otros servicios .-> Discovery[Servicio de Descubrimiento]
+    Order -. Envía alertas y métricas .-> Monitoring[Monitoreo y Logging]
+    Order -. Envía información de trazas .-> Tracing[Distributed Tracing]
     
-    Auth -.-> Discovery
-    User -.-> Discovery
-    Order -.-> Discovery
-    Product -.-> Discovery
-    Payment -.-> Discovery
-    Notification -.-> Discovery
+    Order --> Product[Servicio de Productos]
+    Order --> Payment[Servicio de Pagos]
     
-    Auth -.-> Monitoring
-    User -.-> Monitoring
-    Order -.-> Monitoring
-    Product -.-> Monitoring
-    Payment -.-> Monitoring
-    Notification -.-> Monitoring
-    
-    Auth -.-> Tracing
-    User -.-> Tracing
-    Order -.-> Tracing
-    Product -.-> Tracing
-    Payment -.-> Tracing
-    Notification -.-> Tracing
+    style Order fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Product fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Payment fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
+    style Config fill:#f9d77e,stroke:#112d4e,stroke-width:2px
+    style Discovery fill:#a3c9a8,stroke:#112d4e,stroke-width:2px
+    style Monitoring fill:#84b1ed,stroke:#112d4e,stroke-width:2px
+    style Tracing fill:#d998b3,stroke:#112d4e,stroke-width:2px
 ```
 
 ## Estructura de Proyecto Típica para Microservicios
