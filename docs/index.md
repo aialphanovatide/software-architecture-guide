@@ -1,50 +1,50 @@
-# Software Architecture Guide
+# Guía de Arquitectura de Software
 
-Welcome to our comprehensive guide on software architecture. This resource is designed to help our team develop a shared understanding of architectural principles, patterns, and best practices.
+Bienvenido a nuestra guía integral sobre arquitectura de software. Este recurso está diseñado para ayudar a nuestro equipo a desarrollar un entendimiento compartido de los principios arquitectónicos, patrones y mejores prácticas.
 
-## Purpose of This Guide
+## Propósito de Esta Guía
 
-This guide serves as a learning resource to help engineers at all levels:
+Esta guía sirve como un recurso de aprendizaje para ayudar a ingenieros de todos los niveles a:
 
-- Understand key architectural concepts
-- Apply design patterns effectively
-- Learn domain-driven design principles
-- Master microservices architecture
-- Implement SOLID principles
-- Develop a common vocabulary for discussing architecture
+- Entender conceptos arquitectónicos clave
+- Aplicar patrones de diseño de manera efectiva
+- Aprender principios de diseño dirigido por dominio
+- Dominar la arquitectura de microservicios
+- Implementar principios SOLID
+- Desarrollar un vocabulario común para discutir arquitectura
 
-## Focus Areas
+## Áreas de Enfoque
 
-Based on our team's needs, this guide particularly focuses on:
+Basado en las necesidades de nuestro equipo, esta guía se enfoca particularmente en:
 
-1. **Domain-Driven Design (DDD)** - Designing software around the business domain
-2. **Microservices Architecture** - Building distributed systems with independent services
-3. **SOLID Principles** - Fundamental principles for creating maintainable software
+1. **Diseño Dirigido por Dominio (DDD)** - Diseñar software alrededor del dominio de negocio
+2. **Arquitectura de Microservicios** - Construir sistemas distribuidos con servicios independientes
+3. **Principios SOLID** - Principios fundamentales para crear software mantenible
 
-## How to Use This Guide
+## Cómo Usar Esta Guía
 
-This guide is structured to support both deep study and quick reference:
+Esta guía está estructurada para soportar tanto el estudio profundo como la referencia rápida:
 
-- Start with the core concepts in each section
-- Explore practical examples that demonstrate principles in action
-- Use the navigation to find specific topics of interest
+- Comienza con los conceptos centrales en cada sección
+- Explora ejemplos prácticos que demuestran los principios en acción
+- Usa la navegación para encontrar temas específicos de interés
 
-Each section includes Python (and sometimes TypeScript) examples to illustrate concepts in a way that's relevant to our tech stack and daily work.
+Cada sección incluye ejemplos en Python (y a veces TypeScript) para ilustrar conceptos de una manera relevante para nuestra pila tecnológica y trabajo diario.
 
-## Getting Started
+## Primeros Pasos
 
-For those new to software architecture, we recommend starting with:
+Para aquellos nuevos en la arquitectura de software, recomendamos comenzar con:
 
-1. [SOLID Principles Overview](solid/index.md) - Core principles of object-oriented design
-2. [Domain-Driven Design Overview](ddd/index.md) - Understanding DDD fundamentals
-3. [Microservices Overview](architecture/microservices/index.md) - Introduction to microservices
+1. [Resumen de Principios SOLID](solid/index.md) - Principios fundamentales del diseño orientado a objetos
+2. [Resumen de Diseño Dirigido por Dominio](ddd/index.md) - Comprendiendo los fundamentos del DDD
+3. [Resumen de Microservicios](architecture/microservices/index.md) - Introducción a los microservicios
 
-For those looking to apply these concepts immediately in our codebase, check out:
-- [Python Backend Examples](examples/python-backend.md)
-- [TypeScript Backend Examples](examples/typescript-backend.md)
+Para aquellos que buscan aplicar estos conceptos inmediatamente en nuestro código base, consulta:
+- [Ejemplos de Backend en Python](examples/python-backend.md)
+- [Ejemplos de Backend en TypeScript](examples/typescript-backend.md)
 
-## Contributing to This Guide
+## Contribuir a Esta Guía
 
-This is a living document. As our team grows and evolves, so should this guide. We encourage contributions through pull requests to our documentation repository.
+Este es un documento vivo. A medida que nuestro equipo crece y evoluciona, también debería hacerlo esta guía. Alentamos las contribuciones a través de pull requests a nuestro repositorio de documentación.
 
-Let's build better software together through thoughtful architecture! 
+¡Construyamos mejor software juntos a través de una arquitectura bien pensada! 
