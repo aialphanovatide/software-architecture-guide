@@ -10,6 +10,38 @@
 
 El Principio de Inversión de Dependencias establece que los componentes de alto nivel (políticas de negocio, flujos de trabajo) no deben depender directamente de componentes de bajo nivel (implementaciones específicas, infraestructura). En cambio, ambos deben depender de abstracciones.
 
+## Visualización
+
+```mermaid
+classDiagram
+    %% Diseño tradicional (violando DIP)
+    class SistemaTradicional {
+        title Sin DIP: Dependencia Directa
+    }
+    class ModuloAltoNivel {
+    }
+    class ModuloBajoNivel {
+    }
+    ModuloAltoNivel --> ModuloBajoNivel : Depende directamente
+
+    %% Diseño con DIP
+    class SistemaConDIP {
+        title Con DIP: Inversión de Dependencias
+    }
+    class NegocioAltoNivel {
+    }
+    class InterfazAbstraccion {
+        <<interface>>
+    }
+    class ImplementacionBajoNivel {
+    }
+    NegocioAltoNivel --> InterfazAbstraccion : Depende de abstracción
+    InterfazAbstraccion <|.. ImplementacionBajoNivel : Implementa
+    
+    note for SistemaTradicional "Acoplamiento rígido\nDifícil de cambiar y probar"
+    note for SistemaConDIP "Desacoplado\nFlexible y testeable"
+```
+
 ## ¿Por qué es importante?
 
 - Reduce el acoplamiento entre módulos

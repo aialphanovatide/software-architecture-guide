@@ -8,6 +8,47 @@
 
 El Principio de Abierto-Cerrado establece que deberíamos diseñar nuestras clases, módulos y funciones de manera que se puedan extender (añadir nueva funcionalidad) sin necesidad de modificar el código existente.
 
+## Visualización
+
+```mermaid
+classDiagram
+    %% Diseño sin aplicar OCP
+    class CalculadoraSinOCP {
+        +calcularDescuento(producto, tipoDescuento)
+    }
+    
+    note for CalculadoraSinOCP "Problema: Para añadir un nuevo tipo de descuento\ntenemos que modificar esta clase existente"
+    
+    %% Diseño aplicando OCP
+    class CalculadoraOCP {
+        +calcularDescuento(producto, estrategia)
+    }
+    
+    class EstrategiaDescuento {
+        <<interface>>
+        +calcular(producto)
+    }
+    
+    class DescuentoNormal {
+        +calcular(producto)
+    }
+    
+    class DescuentoPremium {
+        +calcular(producto)
+    }
+    
+    class DescuentoNuevo {
+        +calcular(producto)
+    }
+    
+    CalculadoraOCP --> EstrategiaDescuento : usa
+    EstrategiaDescuento <|.. DescuentoNormal : implementa
+    EstrategiaDescuento <|.. DescuentoPremium : implementa
+    EstrategiaDescuento <|.. DescuentoNuevo : implementa
+    
+    note for EstrategiaDescuento "Solución: Para añadir funcionalidad\nsolo creamos una nueva implementación\nsin tocar el código existente"
+```
+
 ## ¿Por qué es importante?
 
 - **Reducción de riesgos**: Al no modificar código existente, se reduce el riesgo de introducir nuevos errores

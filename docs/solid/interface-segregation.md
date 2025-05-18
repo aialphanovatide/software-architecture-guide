@@ -8,6 +8,61 @@
 
 El Principio de Segregación de Interfaces establece que es mejor tener muchas interfaces específicas en lugar de una interfaz general. Las clases solo deberían conocer los métodos que realmente necesitan usar.
 
+## Visualización
+
+```mermaid
+classDiagram
+    %% Violación de ISP: Interfaz grande
+    class InterfazGrande {
+        <<interface>>
+        +metodo1()
+        +metodo2()
+        +metodo3()
+        +metodo4()
+    }
+    
+    class Cliente1 {
+        +operacion()
+    }
+    
+    class Cliente2 {
+        +operacion()
+    }
+    
+    class Cliente3 {
+        +operacion()
+    }
+    
+    Cliente1 ..> InterfazGrande : usa solo método1
+    Cliente2 ..> InterfazGrande : usa solo método2
+    Cliente3 ..> InterfazGrande : usa solo métodos3,4
+    
+    note for InterfazGrande "Problema: Clientes dependen de\nmétodos que no utilizan"
+    
+    %% Aplicando ISP: Interfaces específicas
+    class InterfazA {
+        <<interface>>
+        +metodo1()
+    }
+    
+    class InterfazB {
+        <<interface>>
+        +metodo2()
+    }
+    
+    class InterfazCD {
+        <<interface>>
+        +metodo3()
+        +metodo4()
+    }
+    
+    Cliente1 ..> InterfazA : usa todo
+    Cliente2 ..> InterfazB : usa todo
+    Cliente3 ..> InterfazCD : usa todo
+    
+    note for InterfazA "Solución: Interfaces\nespecíficas por cliente"
+```
+
 ## ¿Por qué es importante?
 
 - Reduce el acoplamiento entre componentes

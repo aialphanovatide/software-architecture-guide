@@ -14,7 +14,7 @@ Una arquitectura bien diseñada proporciona varios beneficios clave:
 
 ## Principales Estilos Arquitectónicos
 
-### 1. Arquitectura en Capas](layered.md)
+### 1. [Arquitectura en Capas](layered/layered.md)
 
 Organiza el sistema en capas horizontales donde cada capa proporciona servicios a la capa superior y utiliza los servicios de la capa inferior. Es uno de los estilos más comunes y tradicionales.
 

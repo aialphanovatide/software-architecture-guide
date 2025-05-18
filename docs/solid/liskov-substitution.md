@@ -8,6 +8,52 @@
 
 El Principio de Sustitución de Liskov establece que las clases derivadas deben poder sustituir a sus clases base sin afectar el comportamiento esperado del programa. En otras palabras, las subclases deben comportarse de manera que no sorprendan a quienes usan la clase base.
 
+## Visualización
+
+```mermaid
+classDiagram
+    class Forma {
+        <<abstract>>
+        +calcularArea() float
+    }
+    
+    class Rectángulo {
+        -ancho: float
+        -alto: float
+        +establecerAncho(ancho: float)
+        +establecerAlto(alto: float)
+        +calcularArea() float
+    }
+    
+    class Cuadrado {
+        -lado: float
+        +establecerLado(lado: float)
+        +calcularArea() float
+    }
+
+    Forma <|-- Rectángulo : Correcto✓
+    Forma <|-- Cuadrado : Correcto✓
+    
+    class RectánguloLSP {
+        -ancho: float
+        -alto: float
+        +establecerAncho(ancho: float)
+        +establecerAlto(alto: float)
+        +calcularArea() float
+    }
+    
+    class CuadradoLSP~Viola LSP~ {
+        -lado: float
+        +establecerAncho(ancho: float)
+        +establecerAlto(alto: float)
+        +calcularArea() float
+    }
+
+    RectánguloLSP <|-- CuadradoLSP : Incorrecto✗
+    
+    note for CuadradoLSP "Si establecerAncho cambia tanto ancho como alto,\n viola las expectativas de RectánguloLSP"
+```
+
 ## ¿Por qué es importante?
 
 - Garantiza que la herencia se utilice correctamente
