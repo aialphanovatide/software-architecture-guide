@@ -1,29 +1,29 @@
-.PHONY: build up down logs start restart help
+.PHONY: docker-build docker-up docker-down docker-logs start restart help
 
-build:
+docker-build:
 	docker-compose build
 
-up:
+docker-up:
 	docker-compose up -d
 
-down:
+docker-down:
 	docker-compose down
 
-logs:
+docker-logs:
 	docker-compose logs -f
 
 # Combined commands
-start: build up
+start: docker-build docker-up
 	@echo "Docker container is running at http://localhost:8000"
 
-restart: down up
+restart: docker-down docker-up
 	@echo "Docker container has been restarted at http://localhost:8000"
 
 help:
 	@echo "Available commands:"
-	@echo "  build    : Build Docker image"
-	@echo "  up       : Start Docker container"
-	@echo "  down     : Stop Docker container"
-	@echo "  logs     : View Docker logs"
-	@echo "  start    : Build and start Docker container"
-	@echo "  restart  : Restart Docker container" 
+	@echo "  docker-build   : Build Docker image"
+	@echo "  docker-up      : Start Docker container"
+	@echo "  docker-down    : Stop Docker container"
+	@echo "  docker-logs    : View Docker logs"
+	@echo "  start          : Build and start Docker container"
+	@echo "  restart        : Restart Docker container" 

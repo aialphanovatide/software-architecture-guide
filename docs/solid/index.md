@@ -1,57 +1,57 @@
-# SOLID Principles
+# Principios SOLID
 
-The SOLID principles are a set of five design principles that help developers create more maintainable, understandable, and flexible software. These principles were introduced by Robert C. Martin (Uncle Bob) and have become fundamental concepts in object-oriented programming.
+Los principios SOLID son un conjunto de cinco principios de diseño que ayudan a los desarrolladores a crear software más mantenible, comprensible y flexible. Estos principios fueron introducidos por Robert C. Martin (Uncle Bob) y se han convertido en conceptos fundamentales en la programación orientada a objetos.
 
-## Why SOLID Matters
+## Por qué SOLID es importante
 
-SOLID principles help us:
+Los principios SOLID nos ayudan a:
 
-- Create code that's easier to maintain and extend
-- Reduce technical debt
-- Make testing simpler
-- Build systems that can evolve with changing requirements
-- Avoid code smells and anti-patterns
+- Crear código que sea más fácil de mantener y extender
+- Reducir la deuda técnica
+- Simplificar las pruebas
+- Construir sistemas que puedan evolucionar con requisitos cambiantes
+- Evitar code smells y anti-patrones
 
-## The Five SOLID Principles
+## Los cinco principios SOLID
 
-### 1. [Single Responsibility Principle (SRP)](single-responsibility.md)
+### 1. [Principio de Responsabilidad Única (SRP)](single-responsibility.md)
 
-> A class should have only one reason to change.
+> Una clase debe tener una sola razón para cambiar.
 
-Each class should have only one job or responsibility. If a class handles multiple concerns, it becomes coupled to those concerns, making it harder to maintain.
+Cada clase debe tener una sola responsabilidad o trabajo. Si una clase maneja múltiples preocupaciones, se vuelve acoplada a ellas, lo que dificulta su mantenimiento.
 
-### 2. [Open-Closed Principle (OCP)](open-closed.md)
+### 2. [Principio de Abierto-Cerrado (OCP)](open-closed.md)
 
-> Software entities should be open for extension but closed for modification.
+> Las entidades de software deben estar abiertas para la extensión pero cerradas para la modificación.
 
-You should be able to extend a class's behavior without modifying it. This is typically achieved through abstractions and polymorphism.
+Deberías poder extender el comportamiento de una clase sin modificarla. Esto se logra típicamente a través de abstracciones y polimorfismo.
 
-### 3. [Liskov Substitution Principle (LSP)](liskov-substitution.md)
+### 3. [Principio de Sustitución de Liskov (LSP)](liskov-substitution.md)
 
-> Subtypes must be substitutable for their base types.
+> Los subtipos deben ser sustituibles por sus tipos base.
 
-Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program.
+Los objetos de una superclase deben poder ser reemplazados por objetos de una subclase sin afectar la corrección del programa.
 
-### 4. [Interface Segregation Principle (ISP)](interface-segregation.md)
+### 4. [Principio de Segregación de Interfaces (ISP)](interface-segregation.md)
 
-> Clients should not be forced to depend on methods they do not use.
+> Los clientes no deben verse forzados a depender de métodos que no utilizan.
 
-Instead of one large interface, many small, specific interfaces are preferred. This keeps systems decoupled and easier to refactor.
+En lugar de una interfaz grande, son preferibles muchas interfaces pequeñas y específicas. Esto mantiene los sistemas desacoplados y más fáciles de refactorizar.
 
-### 5. [Dependency Inversion Principle (DIP)](dependency-inversion.md)
+### 5. [Principio de Inversión de Dependencias (DIP)](dependency-inversion.md)
 
-> High-level modules should not depend on low-level modules. Both should depend on abstractions.
-> Abstractions should not depend on details. Details should depend on abstractions.
+> Los módulos de alto nivel no deben depender de módulos de bajo nivel. Ambos deben depender de abstracciones.
+> Las abstracciones no deben depender de detalles. Los detalles deben depender de abstracciones.
 
-This reduces coupling between modules and makes testing easier through dependency injection and the use of interfaces.
+Esto reduce el acoplamiento entre módulos y facilita las pruebas a través de la inyección de dependencias y el uso de interfaces.
 
-## SOLID in Practice
+## SOLID en la práctica
 
-SOLID principles work together to create systems that are:
+Los principios SOLID trabajan juntos para crear sistemas que son:
 
-- **Modular** - Components can be developed, tested, and maintained in isolation
-- **Resilient to change** - Changes in one area don't cascade throughout the system
-- **Testable** - Dependencies are explicit and can be mocked or stubbed
-- **Reusable** - Components are focused and can be reused in different contexts
+- **Modulares** - Los componentes pueden desarrollarse, probarse y mantenerse de forma aislada
+- **Resistentes al cambio** - Los cambios en un área no se propagan por todo el sistema
+- **Comprobables** - Las dependencias son explícitas y pueden ser simuladas o sustituidas
+- **Reutilizables** - Los componentes están enfocados y pueden reutilizarse en diferentes contextos
 
-Throughout this guide, you'll see how these principles integrate with other architectural concepts like Domain-Driven Design and Microservices to create robust, maintainable systems. 
+A lo largo de esta guía, verás cómo estos principios se integran con otros conceptos arquitectónicos como el Diseño Dirigido por el Dominio y los Microservicios para crear sistemas robustos y mantenibles. 

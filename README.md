@@ -1,154 +1,136 @@
-# Software Architecture Guide Documentation
+# Guía de Arquitectura de Software
 
-This repository contains a comprehensive guide to software architecture principles, patterns, and best practices. The documentation is built using MkDocs with the Material theme.
+Este repositorio contiene una guía completa sobre principios, patrones y mejores prácticas de arquitectura de software. La documentación está construida usando MkDocs con el tema Material.
 
-## Focus Areas
+## Áreas de Enfoque
 
-The guide focuses on:
+La guía se centra en:
 
-1. Domain-Driven Design (DDD)
-2. Microservices Architecture
-3. SOLID Principles
-4. Design Patterns
-5. Implementation Examples in Python and TypeScript
+1. Diseño Dirigido por el Dominio (DDD)
+2. Arquitectura de Microservicios
+3. Principios SOLID
+4. Patrones de Diseño
+5. Ejemplos de Implementación en Python y TypeScript
 
-## Multilingual Support
+## Comenzando
 
-This documentation is available in multiple languages:
-
-- English (en)
-- Spanish (es)
-
-The language selector will appear in the navigation menu. You can contribute to translations by adding content to the respective language folders in the `docs` directory.
-
-## Getting Started
-
-### Prerequisites
+### Requisitos Previos
 
 - Python 3.8+
-- Docker and Docker Compose (optional)
-- Make (optional, for using the Makefile)
+- Docker y Docker Compose (opcional)
+- Make (opcional, para usar el Makefile)
 
-### Using the Makefile
+### Usando el Makefile
 
-The project includes a Makefile for convenience:
+El proyecto incluye un Makefile para mayor comodidad:
 
 ```bash
-# Show all available commands
+# Mostrar todos los comandos disponibles
 make help
 
-# Local development
-make setup    # Install dependencies
-make run      # Run local development server
+# Desarrollo local
+make setup    # Instalar dependencias
+make run      # Ejecutar servidor de desarrollo local
 
-# Docker operations
-make start-docker    # Build and start in Docker
-make docker-logs     # View logs
-make docker-down     # Stop the Docker container
+# Operaciones de Docker
+make start-docker    # Construir e iniciar en Docker
+make docker-logs     # Ver logs
+make docker-down     # Detener el contenedor Docker
 ```
 
-### Local Development
+### Desarrollo Local
 
-1. Clone this repository:
+1. Clonar este repositorio:
    ```
    git clone <repository-url>
    cd software-architecture-guide
    ```
 
-2. Install dependencies:
+2. Instalar dependencias:
    ```
    pip install -r requirements.txt
    ```
-   Or use: `make setup`
+   O usar: `make setup`
 
-3. Start the development server:
+3. Iniciar el servidor de desarrollo:
    ```
    mkdocs serve
    ```
-   Or use: `make run`
+   O usar: `make run`
 
-4. View the documentation at `http://localhost:8000`
+4. Ver la documentación en `http://localhost:8000`
 
-### Using Docker Compose
+### Usando Docker Compose
 
-1. Start the service:
+1. Iniciar el servicio:
    ```
    docker-compose up -d
    ```
-   Or use: `make docker-up`
+   O usar: `make docker-up`
 
-2. View the documentation at `http://localhost:8000`
+2. Ver la documentación en `http://localhost:8000`
 
-3. Stop the service:
+3. Detener el servicio:
    ```
    docker-compose down
    ```
-   Or use: `make docker-down`
+   O usar: `make docker-down`
 
-### Using Docker (Legacy Method)
+### Usando Docker (Método Legado)
 
-1. Build the Docker image:
+1. Construir la imagen Docker:
    ```
    docker build -t software-architecture-guide .
    ```
 
-2. Run the container:
+2. Ejecutar el contenedor:
    ```
    docker run -p 8000:8000 software-architecture-guide
    ```
 
-3. View the documentation at `http://localhost:8000`
+3. Ver la documentación en `http://localhost:8000`
 
-## Building the Documentation
+## Construyendo la Documentación
 
-To build static HTML files:
+Para construir archivos HTML estáticos:
 
 ```
 mkdocs build
 ```
-Or use: `make build`
+O usar: `make build`
 
-The built site will be in the `site` directory.
+El sitio construido estará en el directorio `site`.
 
-## Contributing
+## Contribuir
 
-We welcome contributions to this guide. To contribute:
+Agradecemos las contribuciones a esta guía. Para contribuir:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+1. Haz un fork del repositorio
+2. Crea una rama de características
+3. Haz tus cambios
+4. Envía un pull request
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 software-architecture-guide/
-├── docs/                    # Documentation content
-│   ├── en/                  # English content
-│   │   ├── index.md         # English home page
-│   │   ├── solid/           # SOLID principles
-│   │   ├── design-patterns/ # Design patterns
-│   │   ├── architecture/    # Architectural styles
-│   │   ├── ddd/             # Domain-Driven Design
-│   │   ├── examples/        # Implementation examples
-│   │   ├── best-practices/  # Best practices
-│   │   └── team-adoption/   # Team adoption strategies
-│   └── es/                  # Spanish content
-│       ├── index.md         # Spanish home page
-│       ├── solid/           # SOLID principles (Spanish)
-│       ├── design-patterns/ # Design patterns (Spanish)
-│       ├── architecture/    # Architectural styles (Spanish)
-│       ├── ddd/             # Domain-Driven Design (Spanish)
-│       ├── examples/        # Implementation examples (Spanish)
-│       ├── best-practices/  # Best practices (Spanish)
-│       └── team-adoption/   # Team adoption strategies (Spanish)
-├── mkdocs.yml               # MkDocs configuration
-├── docker-compose.yml       # Docker Compose configuration
-├── Makefile                 # Automation commands
-├── requirements.txt         # Python dependencies
-└── dockerfile               # Docker configuration
+├── docs/                    # Contenido de la documentación
+│   └── es/                  # Contenido en español
+│       ├── index.md         # Página de inicio
+│       ├── solid/           # Principios SOLID
+│       ├── design-patterns/ # Patrones de diseño
+│       ├── architecture/    # Estilos arquitectónicos
+│       ├── ddd/             # Diseño Dirigido por el Dominio
+│       ├── examples/        # Ejemplos de implementación
+│       ├── best-practices/  # Mejores prácticas
+│       └── team-adoption/   # Estrategias de adopción en equipo
+├── mkdocs.yml               # Configuración de MkDocs
+├── docker-compose.yml       # Configuración de Docker Compose
+├── Makefile                 # Comandos de automatización
+├── requirements.txt         # Dependencias de Python
+└── dockerfile               # Configuración de Docker
 ```
 
-## License
+## Licencia
 
-[Your License] 
+[Tu Licencia] 

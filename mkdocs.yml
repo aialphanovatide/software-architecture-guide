@@ -1,5 +1,5 @@
-site_name: Software Architecture Guide
-site_description: Comprehensive guide to modern software architecture principles and patterns
+site_name: Guía de Arquitectura de Software
+site_description: Guía completa de principios y patrones de arquitectura de software moderna
 site_author: Your Team
 
 theme:
@@ -36,72 +36,46 @@ markdown_extensions:
 plugins:
   - search
   - mermaid2
-  - i18n:
-      default_language: en
-      languages:
-        en: English
-        es: Español
-      nav_translations:
-        es:
-          Home: Inicio
-          "SOLID Principles": "Principios SOLID"
-          Overview: "Visión general"
-          "Design Patterns": "Patrones de Diseño"
-          "Architectural Styles": "Estilos Arquitectónicos"
-          "Domain-Driven Design": "Diseño Dirigido por el Dominio"
-          "Implementation Examples": "Ejemplos de Implementación"
-          "Best Practices": "Mejores Prácticas"
-          "Team Adoption": "Adopción en Equipo"
-
-# Configuration for the language selector
-extra:
-  alternate:
-    - name: English
-      link: /en/
-      lang: en
-    - name: Español
-      link: /es/
-      lang: es
 
 nav:
-  - Home: en/index.md
-  - SOLID Principles:
-      - Overview: en/solid/index.md
-      - Single Responsibility: en/solid/single-responsibility.md
-      - Open-Closed: en/solid/open-closed.md
-      - Liskov Substitution: en/solid/liskov-substitution.md
-      - Interface Segregation: en/solid/interface-segregation.md
-      - Dependency Inversion: en/solid/dependency-inversion.md
-  - Design Patterns:
-      - Overview: en/design-patterns/index.md
-      - Creational Patterns: en/design-patterns/creational.md
-      - Structural Patterns: en/design-patterns/structural.md
-      - Behavioral Patterns: en/design-patterns/behavioral.md
-  - Architectural Styles:
-      - Overview: en/architecture/index.md
-      - Layered Architecture: en/architecture/layered.md
-      - Microservices: 
-          - Overview: en/architecture/microservices/index.md
-          - Design Principles: en/architecture/microservices/principles.md
-          - Communication Patterns: en/architecture/microservices/communication.md
-          - Deployment Strategies: en/architecture/microservices/deployment.md
-  - Domain-Driven Design:
-      - Overview: en/ddd/index.md
-      - Ubiquitous Language: en/ddd/ubiquitous-language.md
-      - Bounded Contexts: en/ddd/bounded-contexts.md
-      - Entities and Value Objects: en/ddd/entities-value-objects.md
-      - Aggregates: en/ddd/aggregates.md
-      - Repositories: en/ddd/repositories.md
-      - Domain Services: en/ddd/domain-services.md
-      - Application Services: en/ddd/application-services.md
-  - Implementation Examples:
-      - Python Backend: en/examples/python-backend.md
-      - TypeScript Backend: en/examples/typescript-backend.md
-  - Best Practices:
-      - Code Organization: en/best-practices/code-organization.md
-      - Configuration Management: en/best-practices/configuration-management.md
-      - Testing Strategies: en/best-practices/testing.md
-  - Team Adoption:
-      - Architecture Decision Records: en/team-adoption/adrs.md
-      - Code Reviews: en/team-adoption/code-reviews.md
-      - Knowledge Sharing: en/team-adoption/knowledge-sharing.md 
+  - Inicio: index.md
+  - Principios SOLID:
+      - Visión general: solid/index.md
+      - Responsabilidad Única: solid/single-responsibility.md
+      - Abierto-Cerrado: solid/open-closed.md
+      - Sustitución de Liskov: solid/liskov-substitution.md
+      - Segregación de Interfaces: solid/interface-segregation.md
+      - Inversión de Dependencias: solid/dependency-inversion.md
+  - Patrones de Diseño:
+      - Visión general: design-patterns/index.md
+      - Patrones Creacionales: design-patterns/creational.md
+      - Patrones Estructurales: design-patterns/structural.md
+      - Patrones de Comportamiento: design-patterns/behavioral.md
+  - Estilos Arquitectónicos:
+      - Visión general: architecture/index.md
+      - Arquitectura en Capas: architecture/layered.md
+      - Microservicios: 
+          - Visión general: architecture/microservices/index.md
+          - Principios de Diseño: architecture/microservices/principles.md
+          - Patrones de Comunicación: architecture/microservices/communication.md
+          - Estrategias de Despliegue: architecture/microservices/deployment.md
+  - Diseño Dirigido por el Dominio:
+      - Visión general: ddd/index.md
+      - Lenguaje Ubícuo: ddd/ubiquitous-language.md
+      - Contextos Delimitados: ddd/bounded-contexts.md
+      - Entidades y Objetos de Valor: ddd/entities-value-objects.md
+      - Agregados: ddd/aggregates.md
+      - Repositorios: ddd/repositories.md
+      - Servicios de Dominio: ddd/domain-services.md
+      - Servicios de Aplicación: ddd/application-services.md
+  - Ejemplos de Implementación:
+      - Backend en Python: examples/python-backend.md
+      - Backend en TypeScript: examples/typescript-backend.md
+  - Mejores Prácticas:
+      - Organización del Código: best-practices/code-organization.md
+      - Gestión de Configuración: best-practices/configuration-management.md
+      - Estrategias de Pruebas: best-practices/testing.md
+  - Adopción en Equipo:
+      - Registros de Decisiones de Arquitectura: team-adoption/adrs.md
+      - Revisiones de Código: team-adoption/code-reviews.md
+      - Compartición de Conocimiento: team-adoption/knowledge-sharing.md 
