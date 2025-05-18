@@ -24,7 +24,7 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.expand
+    - navigation.collapse
     - navigation.indexes
     - navigation.top
     - content.code.copy
@@ -53,19 +53,20 @@ plugins:
 
 nav:
   - Inicio: index.md
-  - Principios SOLID:
-      - Visión general: solid/index.md
-      - Responsabilidad Única: solid/single-responsibility.md
-      - Abierto-Cerrado: solid/open-closed.md
-      - Sustitución de Liskov: solid/liskov-substitution.md
-      - Segregación de Interfaces: solid/interface-segregation.md
-      - Inversión de Dependencias: solid/dependency-inversion.md
-  - Patrones de Diseño:
-      - Visión general: design-patterns/index.md
-      - Patrones Creacionales: design-patterns/creational.md
-      - Patrones Estructurales: design-patterns/structural.md
-      - Patrones de Comportamiento: design-patterns/behavioral.md
-  - Estilos Arquitectónicos:
+  - Módulo 1 - Fundamentos:
+      - Principios SOLID:
+          - Visión general: solid/index.md
+          - Responsabilidad Única: solid/single-responsibility.md
+          - Abierto-Cerrado: solid/open-closed.md
+          - Sustitución de Liskov: solid/liskov-substitution.md
+          - Segregación de Interfaces: solid/interface-segregation.md
+          - Inversión de Dependencias: solid/dependency-inversion.md
+      - Patrones de Diseño:
+          - Visión general: design-patterns/index.md
+          - Patrones Creacionales: design-patterns/creational.md
+          - Patrones Estructurales: design-patterns/structural.md
+          - Patrones de Comportamiento: design-patterns/behavioral.md
+  - Módulo 2 - Arquitecturas:
       - Visión general: architecture/index.md
       - Arquitectura en Capas: architecture/layered/layered.md
       - Microservicios: 
@@ -74,24 +75,31 @@ nav:
           - Patrones de Comunicación: architecture/microservices/communication.md
           - Estrategias de Despliegue: architecture/microservices/deployment.md
           - Estructura de Código: architecture/microservices/code-structure.md
-  - Diseño Dirigido por el Dominio:
-      - Visión general: ddd/index.md
-      - Lenguaje Ubícuo: ddd/ubiquitous-language.md
-      - Contextos Delimitados: ddd/bounded-contexts.md
-      - Entidades y Objetos de Valor: ddd/entities-value-objects.md
-      - Agregados: ddd/aggregates.md
-      - Repositorios: ddd/repositories.md
-      - Servicios de Dominio: ddd/domain-services.md
-      - Servicios de Aplicación: ddd/application-services.md
-      - Estructura de Código: ddd/code-structure.md
-  - Mejores Prácticas:
-      - Organización del Código: best-practices/code-organization.md
-      - Gestión de Configuración: best-practices/configuration-management.md
-      - Estrategias de Pruebas: best-practices/testing.md
-      - Documentación: best-practices/documentation.md
-  - Adopción en Equipo:
-      - Registros de Decisiones de Arquitectura: team-adoption/adrs.md
-      - Revisiones de Código: team-adoption/code-reviews.md
-      - Compartición de Conocimiento: team-adoption/knowledge-sharing.md
-      - Transición a Microservicios: team-adoption/microservices-transition.md
-      - Implementación de DDD: team-adoption/ddd-implementation.md 
+  - Módulo 3 - DDD:
+      - Diseño Dirigido por el Dominio:
+          - Introducción a DDD: ddd/index.md
+          - Fundamentos para Principiantes:
+              - Lenguaje Ubícuo: ddd/ubiquitous-language.md
+              - Entidades y Objetos de Valor: ddd/entities-value-objects.md
+              - Agregados: ddd/aggregates.md
+              - Repositorios: ddd/repositories.md
+          - Conceptos Intermedios:
+              - Servicios de Dominio: ddd/domain-services.md
+              - Servicios de Aplicación: ddd/application-services.md
+          - Conceptos Avanzados:
+              - Contextos Delimitados: ddd/bounded-contexts.md
+              - Estructura de Código: ddd/code-structure.md
+          - Aplicación Práctica:
+              - Ejemplos Paso a Paso: ddd/examples.md
+              - Guía de Implementación: team-adoption/ddd-implementation.md
+  - Módulo 4 - Prácticas y Adopción:
+      - Mejores Prácticas:
+          - Organización del Código: best-practices/code-organization.md
+          - Gestión de Configuración: best-practices/configuration-management.md
+          - Estrategias de Pruebas: best-practices/testing.md
+          - Documentación: best-practices/documentation.md
+      - Adopción en Equipo:
+          - Registros de Decisiones de Arquitectura: team-adoption/adrs.md
+          - Revisiones de Código: team-adoption/code-reviews.md
+          - Compartición de Conocimiento: team-adoption/knowledge-sharing.md
+          - Transición a Microservicios: team-adoption/microservices-transition.md 

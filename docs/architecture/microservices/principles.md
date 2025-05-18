@@ -1,145 +1,145 @@
-# Microservices Design Principles
+# Principios de Diseño de Microservicios
 
-Designing effective microservices requires following certain principles to ensure that the architecture delivers on its promises while avoiding common pitfalls.
+El diseño efectivo de microservicios requiere seguir ciertos principios para garantizar que la arquitectura cumpla sus promesas y evite problemas comunes.
 
-## Core Principles
+## Principios Fundamentales
 
-### Single Responsibility
+### Responsabilidad Única
 
-Each microservice should focus on doing one thing well. This aligns with the Single Responsibility Principle from SOLID.
+Cada microservicio debe enfocarse en hacer bien una cosa. Esto se alinea con el Principio de Responsabilidad Única de SOLID.
 
-- A service should encapsulate a specific business capability
-- Its domain should be clearly defined and bounded
-- When a service tries to do too much, consider splitting it
+- Un servicio debe encapsular una capacidad de negocio específica
+- Su dominio debe estar claramente definido y acotado
+- Cuando un servicio intenta hacer demasiado, considere dividirlo
 
-### Autonomy
+### Autonomía
 
-Microservices should be able to function independently:
+Los microservicios deben poder funcionar independientemente:
 
-- Independent lifecycle (development, testing, deployment)
-- Independent scaling
-- Should continue functioning even if other services are down (when possible)
+- Ciclo de vida independiente (desarrollo, pruebas, despliegue)
+- Escalado independiente
+- Deben seguir funcionando incluso si otros servicios están caídos (cuando sea posible)
 
-### Resilience
+### Resiliencia
 
-Services must be designed to handle failure gracefully:
+Los servicios deben estar diseñados para manejar fallos con elegancia:
 
-- Implement circuit breakers to prevent cascading failures
-- Use timeouts appropriately
-- Provide fallback behavior when dependencies are unavailable
-- Gracefully degrade functionality rather than failing completely
+- Implementar cortocircuitos para prevenir fallos en cascada
+- Usar tiempos de espera apropiadamente
+- Proporcionar comportamiento alternativo cuando las dependencias no están disponibles
+- Degradar la funcionalidad con elegancia en lugar de fallar completamente
 
-### API First
+### API Primero
 
-Design the service API before implementation:
+Diseñar la API del servicio antes de la implementación:
 
-- APIs should be consistent across services
-- Use clear versioning strategies
-- Document APIs thoroughly (e.g., with OpenAPI/Swagger)
-- Consider API backward compatibility
+- Las APIs deben ser consistentes entre servicios
+- Usar estrategias claras de versionado
+- Documentar las APIs exhaustivamente (p.ej., con OpenAPI/Swagger)
+- Considerar la compatibilidad hacia atrás de las APIs
 
-### Data Sovereignty
+### Soberanía de Datos
 
-Each service should own its data:
+Cada servicio debe ser propietario de sus datos:
 
-- No direct database access from other services
-- Expose data only through well-defined APIs
-- Consider eventual consistency between services
-- Use domain events to notify other services of changes
+- Sin acceso directo a la base de datos desde otros servicios
+- Exponer datos solo a través de APIs bien definidas
+- Considerar la consistencia eventual entre servicios
+- Usar eventos de dominio para notificar a otros servicios sobre cambios
 
-## Service Boundaries
+## Límites de Servicio
 
-The most critical decision in microservices is determining service boundaries. This is where Domain-Driven Design concepts become especially valuable:
+La decisión más crítica en microservicios es determinar los límites de servicio. Aquí es donde los conceptos de Diseño Dirigido por el Dominio (DDD) son especialmente valiosos:
 
-### Bounded Context Alignment
+### Alineación de Contextos Delimitados
 
-- Align microservices with DDD bounded contexts
-- Each bounded context has its own ubiquitous language
-- Different contexts may model the same real-world entities differently
+- Alinear microservicios con contextos delimitados de DDD
+- Cada contexto delimitado tiene su propio lenguaje ubicuo
+- Diferentes contextos pueden modelar las mismas entidades del mundo real de manera diferente
 
-### Business Capability Focus
+### Enfoque en Capacidades de Negocio
 
-- Organize around business capabilities, not technical functions
-- Ask "what business function does this serve?" not "what technology does this use?"
-- Cross-functional teams should own entire microservices
+- Organizar en torno a capacidades de negocio, no funciones técnicas
+- Preguntar "¿qué función de negocio sirve esto?" en lugar de "¿qué tecnología usa esto?"
+- Los equipos multifuncionales deben poseer microservicios completos
 
-### Right-Sizing Services
+### Dimensionamiento Adecuado de Servicios
 
-There's no fixed rule for service size, but consider:
+No hay una regla fija para el tamaño del servicio, pero considere:
 
-- Team organization (2-pizza team rule)
-- Deployment independence
-- Development complexity
-- Resource utilization
+- Organización del equipo (regla del equipo de 2 pizzas)
+- Independencia de despliegue
+- Complejidad de desarrollo
+- Utilización de recursos
 
-Too large services lose microservice benefits; too small services increase distributed system complexity.
+Los servicios demasiado grandes pierden los beneficios de los microservicios; los servicios demasiado pequeños aumentan la complejidad del sistema distribuido.
 
-## Implementation Example
+## Ejemplo de Implementación
 
-Let's look at a simple example of properly bounded microservices:
+Veamos un ejemplo simple de microservicios correctamente delimitados:
 
 ```python
-# User Service - Manages user accounts and profiles
+# Servicio de Usuario - Gestiona cuentas y perfiles de usuario
 class UserService:
     def register_user(self, username, email, password):
-        # Implementation for user registration
+        # Implementación para registro de usuario
         pass
         
     def authenticate(self, username, password):
-        # Implementation for authentication
+        # Implementación para autenticación
         pass
     
     def get_user_profile(self, user_id):
-        # Implementation to fetch user profile
+        # Implementación para obtener perfil de usuario
         pass
     
-# Order Service - Manages orders and related operations
+# Servicio de Pedidos - Gestiona pedidos y operaciones relacionadas
 class OrderService:
     def __init__(self, user_service_client):
-        # Inject a client to communicate with User Service
+        # Inyectar un cliente para comunicarse con el Servicio de Usuario
         self.user_service_client = user_service_client
     
     def create_order(self, user_id, items):
-        # Verify user exists by calling User Service
+        # Verificar que el usuario existe llamando al Servicio de Usuario
         user = self.user_service_client.get_user(user_id)
         if not user:
-            raise ValueError("User not found")
+            raise ValueError("Usuario no encontrado")
             
-        # Process order
-        # Save order to Order Service's own database
+        # Procesar pedido
+        # Guardar pedido en la propia base de datos del Servicio de Pedidos
         pass
     
     def get_user_orders(self, user_id):
-        # Return orders for a specific user
+        # Devolver pedidos para un usuario específico
         pass
 ```
 
-This example demonstrates:
-- Clear separation of responsibilities between services
-- Independent data ownership
-- Services communicating through well-defined APIs
-- Dependency injection for service communication
+Este ejemplo demuestra:
+- Clara separación de responsabilidades entre servicios
+- Propiedad independiente de datos
+- Servicios comunicándose a través de APIs bien definidas
+- Inyección de dependencias para la comunicación entre servicios
 
-## Common Anti-Patterns
+## Anti-patrones Comunes
 
-Avoid these common microservices design mistakes:
+Evite estos errores comunes de diseño de microservicios:
 
-1. **Distributed Monolith** - Microservices that are tightly coupled and must be deployed together
-2. **Shared Database** - Multiple services accessing the same database tables directly
-3. **Chatty Services** - Services making too many calls to each other for simple operations
-4. **Anemic Services** - Services that are too thin and lack domain logic
-5. **Inconsistent Interfaces** - Each service using different API styles, error handling, etc.
+1. **Monolito Distribuido** - Microservicios que están estrechamente acoplados y deben desplegarse juntos
+2. **Base de Datos Compartida** - Múltiples servicios accediendo directamente a las mismas tablas de base de datos
+3. **Servicios Charladores** - Servicios que hacen demasiadas llamadas entre sí para operaciones simples
+4. **Servicios Anémicos** - Servicios que son demasiado delgados y carecen de lógica de dominio
+5. **Interfaces Inconsistentes** - Cada servicio usando diferentes estilos de API, manejo de errores, etc.
 
-## Practical Guidelines
+## Pautas Prácticas
 
-When designing microservices:
+Al diseñar microservicios:
 
-1. **Start with a monolith** first for new projects, then extract microservices once boundaries are clear
-2. **Use DDD techniques** to identify bounded contexts
-3. **Create a service template** to ensure consistency across services
-4. **Document interaction patterns** between services
-5. **Establish team ownership** of services
-6. **Define SLAs** for each service to set expectations
-7. **Plan for failure** in every service interaction
+1. **Comience con un monolito** primero para nuevos proyectos, luego extraiga microservicios una vez que los límites estén claros
+2. **Use técnicas DDD** para identificar contextos delimitados
+3. **Cree una plantilla de servicio** para asegurar la consistencia entre servicios
+4. **Documente patrones de interacción** entre servicios
+5. **Establezca la propiedad del equipo** de los servicios
+6. **Defina SLAs** para cada servicio para establecer expectativas
+7. **Planifique para el fracaso** en cada interacción de servicio
 
-Following these principles will help create a maintainable, scalable microservices architecture that delivers real business value. 
+Seguir estos principios ayudará a crear una arquitectura de microservicios mantenible y escalable que proporcione un valor empresarial real. 
