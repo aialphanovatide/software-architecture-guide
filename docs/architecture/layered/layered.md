@@ -11,6 +11,37 @@ La arquitectura en capas se basa en los siguientes principios:
 3. **Aislamiento**: Los cambios en una capa no deberían afectar a las capas no adyacentes.
 4. **Dependencia unidireccional**: Las capas superiores dependen de las inferiores, pero no al revés.
 
+## Diagrama de la Arquitectura en Capas
+
+```mermaid
+graph TD
+    subgraph "Flujo de Solicitudes"
+        Request[Solicitud HTTP] --> C
+        C --> S
+        S --> R
+        R --> DB[(Base de Datos)]
+        DB --> R
+        R --> S
+        S --> C
+        C --> Response[Respuesta HTTP]
+    end
+    
+    subgraph "Capas de la Aplicación"
+        C[Capa de Presentación]
+        S[Capa de Aplicación]
+        R[Capa de Dominio]
+        I[Capa de Infraestructura]
+    end
+    
+    R --> I
+    I --> DB
+    
+    style C fill:#f9d77e,stroke:#333,stroke-width:2px
+    style S fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style R fill:#84b1ed,stroke:#333,stroke-width:2px
+    style I fill:#d998b3,stroke:#333,stroke-width:2px
+```
+
 ## Capas Típicas
 
 Una aplicación típica basada en capas suele incluir las siguientes capas (de arriba hacia abajo):
@@ -152,6 +183,94 @@ class RepositorioUsuariosSQLAlchemy(RepositorioUsuarios):
         return usuario_model.to_entity()
 ```
 
+## Estructura de Proyecto para Arquitectura en Capas
+
+Una estructura de proyecto bien organizada es crucial para implementar efectivamente una arquitectura en capas. A continuación se muestra una estructura de proyecto recomendada para una aplicación Flask que sigue este patrón:
+
+```
+layered-flask-application/
+│
+├── app/                            # Código principal de la aplicación
+│   ├── presentation/               # Capa de Presentación
+│   │   ├── api/                    # Endpoints API
+│   │   │   ├── __init__.py
+│   │   │   ├── auth_routes.py
+│   │   │   ├── user_routes.py
+│   │   │   └── error_handlers.py
+│   │   ├── web/                    # Interfaces web (si aplica)
+│   │   │   ├── __init__.py
+│   │   │   ├── forms.py
+│   │   │   └── views.py
+│   │   ├── dto/                    # Data Transfer Objects
+│   │   │   ├── __init__.py
+│   │   │   └── user_dto.py
+│   │   └── __init__.py
+│   │
+│   ├── application/                # Capa de Aplicación
+│   │   ├── services/               # Servicios de aplicación
+│   │   │   ├── __init__.py
+│   │   │   ├── user_service.py
+│   │   │   └── auth_service.py
+│   │   ├── use_cases/              # Casos de uso específicos
+│   │   │   ├── __init__.py
+│   │   │   └── user_registration.py
+│   │   └── __init__.py
+│   │
+│   ├── domain/                     # Capa de Dominio
+│   │   ├── models/                 # Entidades y objetos de valor
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py
+│   │   │   └── value_objects.py
+│   │   ├── interfaces/             # Interfaces/puertos
+│   │   │   ├── __init__.py
+│   │   │   └── repositories.py
+│   │   ├── services/               # Servicios de dominio
+│   │   │   ├── __init__.py
+│   │   │   └── password_service.py
+│   │   ├── exceptions.py           # Excepciones de dominio
+│   │   └── __init__.py
+│   │
+│   ├── infrastructure/             # Capa de Infraestructura
+│   │   ├── persistence/            # Implementación de persistencia
+│   │   │   ├── __init__.py
+│   │   │   ├── database.py         # Configuración de DB
+│   │   │   ├── models/             # Modelos ORM
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── user_model.py
+│   │   │   └── repositories/       # Implementaciones de repositorios
+│   │   │       ├── __init__.py
+│   │   │       └── user_repository.py
+│   │   ├── external/               # Servicios externos
+│   │   │   ├── __init__.py
+│   │   │   └── email_service.py    
+│   │   ├── auth/                   # Implementación de autenticación
+│   │   │   ├── __init__.py
+│   │   │   └── jwt_provider.py
+│   │   └── __init__.py
+│   │
+│   ├── config/                     # Configuración
+│   │   ├── __init__.py
+│   │   └── settings.py
+│   │
+│   └── __init__.py                 # Factory de la aplicación
+│
+├── tests/                          # Pruebas
+│   ├── unit/
+│   │   ├── domain/
+│   │   ├── application/
+│   │   └── infrastructure/
+│   ├── integration/
+│   └── e2e/
+│
+├── migrations/                     # Migraciones de base de datos
+├── requirements.txt                # Dependencias
+├── .env.example                    # Ejemplo de variables de entorno
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+
 ## Beneficios de la Arquitectura en Capas
 
 - **Separación de preocupaciones**: Cada capa tiene un enfoque claro, facilitando el mantenimiento.
@@ -167,14 +286,121 @@ class RepositorioUsuariosSQLAlchemy(RepositorioUsuarios):
 - **Tentación de acceso directo**: Los desarrolladores pueden verse tentados a saltarse capas.
 - **Acoplamiento vertical**: Si no se diseñan correctamente las interfaces, las capas pueden acoplarse estrechamente.
 
-## Relación con Otros Patrones
+## Implementación en la Práctica
 
-La arquitectura en capas se complementa bien con:
+### Principios de Diseño a Seguir
 
-- **Patrón Repositorio**: Para abstraer el acceso a datos en la capa de infraestructura.
-- **Inyección de Dependencias**: Para gestionar las dependencias entre capas.
-- **Patrón Fachada**: Para simplificar interfaces complejas entre capas.
-- **Diseño Dirigido por el Dominio (DDD)**: La arquitectura en capas proporciona la estructura para implementar DDD.
+```mermaid
+graph TB
+    subgraph "Principios de Diseño para Arquitectura en Capas"
+        A[Dependencia Hacia Abajo] --> B[Abstracciones en Límites de Capas]
+        B --> C[Inversión de Dependencias para Flexibilidad]
+        C --> D[Entidades de Dominio Limpias]
+        D --> E[DTOs para Cruzar Límites de Capas]
+    end
+    
+    style A fill:#f9d77e,stroke:#333,stroke-width:2px
+    style B fill:#a3c9a8,stroke:#333,stroke-width:2px
+    style C fill:#84b1ed,stroke:#333,stroke-width:2px
+    style D fill:#d998b3,stroke:#333,stroke-width:2px
+    style E fill:#c5a3e6,stroke:#333,stroke-width:2px
+```
+
+1. **Aplicar estrictamente la regla de dependencia**: Las capas superiores pueden conocer las inferiores, pero nunca al revés.
+   
+2. **Utilizar interfaces en los límites de las capas**: Definir interfaces claras en el dominio que luego se implementan en la infraestructura.
+   
+3. **Implementar inyección de dependencias**: Para conectar las implementaciones concretas con las interfaces.
+   
+4. **Usar DTOs para transferir datos entre capas**: Evitar filtración de detalles de implementación entre capas.
+   
+5. **Mantener entidades de dominio limpias**: Las entidades de dominio no deben depender de frameworks o detalles de infraestructura.
+
+### Ejemplo de Código Completo con Inversión de Dependencias
+
+```python
+# domain/interfaces/repositories.py
+class RepositorioUsuarios:
+    """Interfaz de repositorio definida en el dominio"""
+    
+    @abstractmethod
+    def obtener_por_id(self, usuario_id):
+        pass
+    
+    @abstractmethod
+    def guardar(self, usuario):
+        pass
+
+# domain/services/password_service.py
+class ServicioPassword:
+    """Servicio de dominio para gestión de passwords"""
+    
+    @abstractmethod
+    def hashear(self, password):
+        pass
+    
+    @abstractmethod
+    def verificar(self, hash_guardado, password_ingresado):
+        pass
+
+# infrastructure/auth/password_service_impl.py
+class ServicioPasswordBcrypt(ServicioPassword):
+    """Implementación de infraestructura del servicio de password"""
+    
+    def hashear(self, password):
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    
+    def verificar(self, hash_guardado, password_ingresado):
+        return bcrypt.checkpw(password_ingresado.encode('utf-8'), hash_guardado)
+
+# application/services/user_service.py
+class ServicioUsuarios:
+    """Servicio de aplicación que orquesta operaciones de usuario"""
+    
+    def __init__(self, repositorio_usuarios, servicio_password):
+        self.repositorio_usuarios = repositorio_usuarios
+        self.servicio_password = servicio_password
+    
+    def registrar_usuario(self, datos_registro):
+        # Lógica de aplicación
+        usuario = Usuario(
+            nombre=datos_registro.nombre,
+            email=datos_registro.email,
+            password=self.servicio_password.hashear(datos_registro.password)
+        )
+        return self.repositorio_usuarios.guardar(usuario)
+```
+
+## Relación con Otros Patrones y Arquitecturas
+
+La arquitectura en capas se complementa y combina bien con otros enfoques arquitectónicos:
+
+### Arquitectura en Capas y DDD
+
+El **Diseño Dirigido por el Dominio (DDD)** encaja perfectamente con la arquitectura en capas:
+
+- La **capa de dominio** se convierte en el núcleo donde se implementan los agregados, entidades y objetos de valor de DDD
+- Los **contextos delimitados** pueden implementarse como subsistemas separados, cada uno con su propia estructura en capas
+- Los **repositorios** de DDD se definen en el dominio e implementan en la infraestructura
+- La **capa de aplicación** implementa los casos de uso que orquestan los objetos de dominio
+
+### Arquitectura Hexagonal (Puertos y Adaptadores)
+
+La Arquitectura Hexagonal es una evolución de la arquitectura en capas que:
+
+- Coloca el dominio en el centro (similar a la capa de dominio)
+- Define "puertos" (interfaces) en el dominio
+- Implementa "adaptadores" en la infraestructura
+- Permite múltiples adaptadores para un mismo puerto (ej: API REST y CLI como adaptadores primarios)
+
+### Arquitectura Limpia (Clean Architecture)
+
+La Arquitectura Limpia de Robert C. Martin amplía los conceptos de la arquitectura en capas:
+
+- Establece reglas estrictas de dependencia
+- Utiliza más capas con fronteras claras (Entidades, Casos de Uso, Adaptadores de Interfaz, Frameworks)
+- Enfatiza la independencia de frameworks
+- Busca hacer el sistema comprobable sin elementos externos
 
 ## Cuándo Usar Arquitectura en Capas
 
@@ -199,4 +425,6 @@ La arquitectura en capas es especialmente adecuada para:
 
 ## Conclusión
 
-La arquitectura en capas es un patrón fundamental en el diseño de software que proporciona estructura, separación de preocupaciones y flexibilidad. Aunque puede no ser tan modular como los microservicios, sigue siendo una excelente opción para muchos tipos de aplicaciones, especialmente aquellas con lógica de negocio compleja que se beneficia de una clara separación de responsabilidades. 
+La arquitectura en capas es un patrón fundamental en el diseño de software que proporciona estructura, separación de preocupaciones y flexibilidad. Aunque puede no ser tan modular como los microservicios, sigue siendo una excelente opción para muchos tipos de aplicaciones, especialmente aquellas con lógica de negocio compleja que se beneficia de una clara separación de responsabilidades.
+
+Esta arquitectura también sirve como base para otros estilos más avanzados como la Arquitectura Hexagonal o Clean Architecture, y se complementa perfectamente con enfoques como el Diseño Dirigido por el Dominio (DDD). 

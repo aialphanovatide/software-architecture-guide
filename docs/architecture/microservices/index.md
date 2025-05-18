@@ -45,20 +45,199 @@ Los microservicios representan una evolución del enfoque monolítico tradiciona
 - **Coordinación de servicios**: Gestión de dependencias entre servicios
 - **Pruebas**: Las pruebas de extremo a extremo se vuelven más complejas
 
-## Diagrama de Arquitectura de Microservicios
+## Arquitectura de Referencia Completa
+
+El siguiente diagrama muestra una arquitectura de microservicios completa con todos los componentes clave:
 
 ```mermaid
 graph TD
-    Client[Aplicación Cliente] --> Gateway[API Gateway]
-    Gateway --> Service1[Servicio de Usuarios]
-    Gateway --> Service2[Servicio de Pedidos]
-    Gateway --> Service3[Servicio de Pagos]
-    Service1 --> DB1[(BD Usuarios)]
-    Service2 --> DB2[(BD Pedidos)]
-    Service3 --> DB3[(BD Pagos)]
-    Service2 --> Service1
-    Service3 --> Service2
+    Client[Cliente Web/Móvil] --> API[API Gateway]
+    API --> Auth[Servicio de Autenticación]
+    API --> User[Servicio de Usuarios]
+    API --> Order[Servicio de Pedidos]
+    API --> Product[Servicio de Productos]
+    API --> Payment[Servicio de Pagos]
+    API --> Notification[Servicio de Notificaciones]
+    
+    Auth --> AuthDB[(BD Auth)]
+    User --> UserDB[(BD Usuarios)]
+    Order --> OrderDB[(BD Pedidos)]
+    Product --> ProductDB[(BD Productos)]
+    Payment --> PaymentDB[(BD Pagos)]
+    
+    Order --> Product
+    Order --> User
+    Payment --> Order
+    Payment --> EventBus
+    
+    EventBus[Event Bus / Message Queue] --> Notification
+    Notification --> Email[Email Service]
+    Notification --> SMS[SMS Service]
+    Notification --> Push[Push Notifications]
+    
+    subgraph "Infraestructura Común"
+        Config[Servicio de Configuración]
+        Discovery[Servicio de Descubrimiento]
+        Monitoring[Monitoreo y Logging]
+        Tracing[Distributed Tracing]
+    end
+    
+    Auth -.-> Config
+    User -.-> Config
+    Order -.-> Config
+    Product -.-> Config
+    Payment -.-> Config
+    Notification -.-> Config
+    
+    Auth -.-> Discovery
+    User -.-> Discovery
+    Order -.-> Discovery
+    Product -.-> Discovery
+    Payment -.-> Discovery
+    Notification -.-> Discovery
+    
+    Auth -.-> Monitoring
+    User -.-> Monitoring
+    Order -.-> Monitoring
+    Product -.-> Monitoring
+    Payment -.-> Monitoring
+    Notification -.-> Monitoring
+    
+    Auth -.-> Tracing
+    User -.-> Tracing
+    Order -.-> Tracing
+    Product -.-> Tracing
+    Payment -.-> Tracing
+    Notification -.-> Tracing
 ```
+
+## Estructura de Proyecto Típica para Microservicios
+
+Una estructura de proyecto de microservicios bien organizada puede facilitar enormemente la gestión del código. A continuación se muestra una estructura de proyecto recomendada para una aplicación de microservicios:
+
+```
+e-commerce-microservices/
+│
+├── api-gateway/                   # API Gateway
+│   ├── src/                       # Código fuente
+│   ├── tests/                     # Pruebas
+│   ├── Dockerfile                 # Configuración de Docker
+│   ├── package.json               # Dependencias (si es Node.js)
+│   └── requirements.txt           # Dependencias (si es Python)
+│
+├── user-service/                  # Servicio de Usuarios
+│   ├── src/
+│   │   ├── api/                   # Controladores de API
+│   │   ├── core/                  # Lógica de dominio
+│   │   ├── infrastructure/        # Acceso a datos, clientes externos
+│   │   └── main.py               # Punto de entrada
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── order-service/                 # Servicio de Pedidos
+│   ├── src/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── infrastructure/
+│   │   └── main.py
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── product-service/               # Servicio de Productos
+│   ├── src/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── infrastructure/
+│   │   └── main.py
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── payment-service/               # Servicio de Pagos
+│   ├── src/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── infrastructure/
+│   │   └── main.py
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── notification-service/          # Servicio de Notificaciones
+│   ├── src/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── infrastructure/
+│   │   └── main.py
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── shared-lib/                    # Bibliotecas compartidas (con cuidado)
+│   ├── python/                    # Bibliotecas Python
+│   └── typescript/                # Bibliotecas TypeScript
+│
+├── infrastructure/                # Configuración de infraestructura
+│   ├── kubernetes/                # Configuración de Kubernetes
+│   ├── terraform/                 # Scripts de Terraform
+│   ├── prometheus/                # Configuración de monitoreo
+│   └── logging/                   # Configuración de logging
+│
+├── docker-compose.yml             # Configuración para desarrollo local
+├── .github/                       # Configuración de CI/CD
+└── README.md                      # Documentación general
+```
+
+Cada servicio individual sigue una estructura interna consistente:
+
+```
+service-name/
+├── src/
+│   ├── api/                       # Capa de API
+│   │   ├── controllers/           # Controladores de endpoints
+│   │   ├── middleware/            # Middleware (autenticación, validación)
+│   │   ├── dto/                   # Data Transfer Objects
+│   │   └── routes.py              # Definición de rutas
+│   │
+│   ├── core/                      # Lógica de negocio/dominio
+│   │   ├── models/                # Modelos de dominio
+│   │   ├── services/              # Servicios de aplicación
+│   │   └── exceptions/            # Excepciones de dominio
+│   │
+│   ├── infrastructure/            # Infraestructura técnica
+│   │   ├── database/              # Acceso a base de datos
+│   │   │   ├── repositories/      # Implementaciones de repositorios
+│   │   │   └── models/            # Modelos ORM
+│   │   ├── messaging/             # Comunicación con message brokers
+│   │   ├── clients/               # Clientes para otros servicios
+│   │   └── config/                # Configuración
+│   │
+│   └── main.py                    # Punto de entrada principal
+│
+├── tests/                         # Tests organizados en estructura similar
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+│
+├── Dockerfile                     # Configuración de Docker
+├── requirements.txt               # Dependencias
+└── README.md                      # Documentación específica del servicio
+```
+
+## Recomendaciones para la Implementación
+
+Para implementar microservicios efectivamente:
+
+1. **Utiliza API gateways**: para manejar aspectos transversales como autenticación, rate limiting y routing
+2. **Implementa circuit breakers**: para prevenir fallos en cascada cuando un servicio falla
+3. **Adopta observabilidad**: con logging centralizado, monitoreo y tracing distribuido
+4. **Automatiza despliegues**: con CI/CD pipelines e infraestructura como código
+5. **Usa contenedores y orquestación**: Docker y Kubernetes facilitan la gestión de microservicios
+6. **Implementa comunicación asíncrona**: donde sea apropiado para reducir el acoplamiento
+7. **Define contratos de API claros**: con herramientas como OpenAPI/Swagger
+8. **Establece patrones consistentes**: entre diferentes servicios para facilitar el aprendizaje
 
 ## Cuándo usar Microservicios
 
@@ -83,5 +262,5 @@ En las siguientes secciones, exploraremos aspectos clave de la implementación d
 1. [Principios de Diseño](principles.md) - Guías para un diseño efectivo de microservicios
 2. [Patrones de Comunicación](communication.md) - Cómo interactúan los servicios entre sí
 3. [Estrategias de Despliegue](deployment.md) - Enfoques para desplegar microservicios
-
-También examinaremos ejemplos prácticos en Python y TypeScript que muestran cómo se aplican estos conceptos en escenarios de desarrollo del mundo real. 
+4. [Estructura de Código](code-structure.md) - Organización del código dentro de un microservicio
+5. [Ejemplo de Implementación](example-implementation.md) - Ejemplo práctico de microservicios con FastAPI y Express 
