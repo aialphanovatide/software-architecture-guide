@@ -1,6 +1,6 @@
 site_name: Guía de Arquitectura de Software
 site_description: Guía completa de principios y patrones de arquitectura de software moderna
-site_author: Your Team
+site_author: David R.
 
 theme:
   name: material
