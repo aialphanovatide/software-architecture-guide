@@ -35,11 +35,6 @@ graph TD
     
     R --> I
     I --> DB
-    
-    style C fill:#f9d77e,stroke:#333,stroke-width:2px
-    style S fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style R fill:#84b1ed,stroke:#333,stroke-width:2px
-    style I fill:#d998b3,stroke:#333,stroke-width:2px
 ```
 
 ## Capas Típicas
@@ -298,12 +293,6 @@ graph TB
         C --> D[Entidades de Dominio Limpias]
         D --> E[DTOs para Cruzar Límites de Capas]
     end
-    
-    style A fill:#f9d77e,stroke:#333,stroke-width:2px
-    style B fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style C fill:#84b1ed,stroke:#333,stroke-width:2px
-    style D fill:#d998b3,stroke:#333,stroke-width:2px
-    style E fill:#c5a3e6,stroke:#333,stroke-width:2px
 ```
 
 1. **Aplicar estrictamente la regla de dependencia**: Las capas superiores pueden conocer las inferiores, pero nunca al revés.

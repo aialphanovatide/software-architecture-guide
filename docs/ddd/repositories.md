@@ -185,6 +185,192 @@ export class PostgresCustomerRepository implements CustomerRepository {
 4. **Inyección de dependencias**: Utilizar inyección para facilitar pruebas y cambios de implementación.
 5. **Devolver objetos de dominio**: El repositorio siempre debe devolver entidades o agregados completos, no DTOs o estructuras de datos simples.
 
+## Patrón Unit of Work (Unidad de Trabajo)
+
+El patrón Unit of Work complementa al patrón Repository proporcionando un mecanismo para coordinar transacciones entre múltiples repositorios, garantizando la consistencia de los datos cuando se modifican varios agregados.
+
+### Propósito
+
+- **Mantener consistencia transaccional**: Asegurar que múltiples operaciones de persistencia se realicen dentro de una única transacción.
+- **Gestionar cambios en conjunto**: Agrupar operaciones relacionadas que deben ejecutarse como una unidad atómica.
+- **Sincronizar cambios**: Controlar cuándo los cambios se confirman en la base de datos subyacente.
+
+### Implementación en Python
+
+```python
+from abc import ABC, abstractmethod
+from sqlalchemy.orm import Session
+
+class UnitOfWork(ABC):
+    """Interfaz para el patrón Unit of Work."""
+    
+    @abstractmethod
+    def __enter__(self):
+        """Inicia una nueva transacción."""
+        pass
+        
+    @abstractmethod
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Finaliza la transacción actual (commit o rollback)."""
+        pass
+        
+    @abstractmethod
+    def commit(self):
+        """Confirma los cambios actuales."""
+        pass
+        
+    @abstractmethod
+    def rollback(self):
+        """Revierte los cambios actuales."""
+        pass
+
+
+class SqlAlchemyUnitOfWork(UnitOfWork):
+    """Implementación de Unit of Work usando SQLAlchemy."""
+    
+    def __init__(self, session_factory):
+        self.session_factory = session_factory
+        self.session = None
+        
+    def __enter__(self):
+        self.session = self.session_factory()
+        # Crear los repositorios con la sesión actual
+        self.customers = PostgresCustomerRepository(self.session)
+        self.orders = PostgresOrderRepository(self.session)
+        return self
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.rollback()
+        self.session.close()
+        
+    def commit(self):
+        self.session.commit()
+        
+    def rollback(self):
+        self.session.rollback()
+
+
+# Uso del Unit of Work
+def transfer_money(from_id, to_id, amount, uow_factory):
+    with uow_factory() as uow:
+        try:
+            # Obtener las cuentas
+            from_account = uow.accounts.find_by_id(from_id)
+            to_account = uow.accounts.find_by_id(to_id)
+            
+            # Realizar la transferencia
+            from_account.withdraw(amount)
+            to_account.deposit(amount)
+            
+            # Guardar los cambios
+            uow.accounts.save(from_account)
+            uow.accounts.save(to_account)
+            
+            # Confirmar todos los cambios en una transacción
+            uow.commit()
+            
+        except Exception as e:
+            # En caso de error, automáticamente se hace rollback
+            # gracias al bloque __exit__ del with
+            print(f"Error durante la transferencia: {e}")
+            raise
+```
+
+### Implementación en TypeScript
+
+```typescript
+interface UnitOfWork {
+  begin(): Promise<void>;
+  commit(): Promise<void>;
+  rollback(): Promise<void>;
+  getCustomerRepository(): CustomerRepository;
+  getOrderRepository(): OrderRepository;
+}
+
+class PostgresUnitOfWork implements UnitOfWork {
+  private connection: any;
+  private customerRepository: CustomerRepository | null = null;
+  private orderRepository: OrderRepository | null = null;
+
+  constructor(private readonly connectionFactory: () => Promise<any>) {}
+
+  async begin(): Promise<void> {
+    this.connection = await this.connectionFactory();
+    await this.connection.query('BEGIN');
+  }
+
+  async commit(): Promise<void> {
+    await this.connection.query('COMMIT');
+    await this.close();
+  }
+
+  async rollback(): Promise<void> {
+    try {
+      await this.connection.query('ROLLBACK');
+    } finally {
+      await this.close();
+    }
+  }
+
+  getCustomerRepository(): CustomerRepository {
+    if (!this.customerRepository) {
+      this.customerRepository = new PostgresCustomerRepository(this.connection);
+    }
+    return this.customerRepository;
+  }
+
+  getOrderRepository(): OrderRepository {
+    if (!this.orderRepository) {
+      this.orderRepository = new PostgresOrderRepository(this.connection);
+    }
+    return this.orderRepository;
+  }
+
+  private async close(): Promise<void> {
+    if (this.connection) {
+      await this.connection.release();
+      this.connection = null;
+    }
+  }
+}
+
+// Uso del Unit of Work
+async function transferMoney(fromId: string, toId: string, amount: number): Promise<void> {
+  const uow = new PostgresUnitOfWork(getConnectionFactory());
+  
+  try {
+    await uow.begin();
+    
+    const accountRepo = uow.getAccountRepository();
+    const fromAccount = await accountRepo.findById(fromId);
+    const toAccount = await accountRepo.findById(toId);
+    
+    if (!fromAccount || !toAccount) {
+      throw new Error('Una o ambas cuentas no existen');
+    }
+    
+    fromAccount.withdraw(amount);
+    toAccount.deposit(amount);
+    
+    await accountRepo.save(fromAccount);
+    await accountRepo.save(toAccount);
+    
+    await uow.commit();
+  } catch (error) {
+    await uow.rollback();
+    throw error;
+  }
+}
+```
+
+### Beneficios del Unit of Work
+
+1. **Integridad de datos**: Garantiza que las operaciones relacionadas se realicen completamente o se reviertan completamente.
+2. **Simplificación del código**: Centraliza la lógica de gestión de transacciones.
+3. **Desacoplamiento**: Separa la gestión transaccional de la lógica de negocio.
+4. **Mejora la testabilidad**: Facilita la simulación (mocking) de la persistencia en pruebas unitarias.
+
 ## Antipatrones
 
 - **Repositorios genéricos**: Usar un único repositorio genérico para todos los tipos de entidades va en contra del principio de diseño específico del dominio.

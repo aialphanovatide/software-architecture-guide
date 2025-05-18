@@ -33,11 +33,6 @@ classDiagram
     Entidad <|-- Usuario
     ObjetoDeValor <|-- Email
     Usuario --> Email
-    
-    style Entidad fill:#f9d77e,stroke:#333,stroke-width:2px
-    style ObjetoDeValor fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style Usuario fill:#84b1ed,stroke:#333,stroke-width:2px
-    style Email fill:#84b1ed,stroke:#333,stroke-width:2px
 ```
 
 ## Entidades
@@ -82,7 +77,7 @@ class Usuario:
         return hash(self.id)  # Hash basado en identidad
 ```
 
-Observa cómo:
+Se puede observar cómo:
 - El campo `id` contiene la identidad de la entidad
 - La igualdad (`__eq__`) se basa en la identidad, no en los atributos
 - Los métodos permiten cambiar atributos mientras la identidad se mantiene constante
@@ -112,11 +107,6 @@ flowchart LR
     end
     
     email --> direccion
-    
-    style id fill:#f9d77e,stroke:#333,stroke-width:2px
-    style nombre fill:#f9d77e,stroke:#333,stroke-width:2px
-    style email fill:#f9d77e,stroke:#333,stroke-width:2px
-    style direccion fill:#a3c9a8,stroke:#333,stroke-width:2px
 ```
 
 ### Ejemplos de Objetos de Valor
@@ -137,7 +127,7 @@ class Dinero:
     moneda: str
     
     def __post_init__(self):
-        # Lógica de validación (en una implementación real, usaríamos
+        # Lógica de validación (en una implementación real, se utilizaría
         # un enfoque diferente ya que frozen=True impide cambios de atributos)
         if self.cantidad < 0:
             object.__setattr__(self, "cantidad", 0)
@@ -153,8 +143,8 @@ class Dinero:
         return Dinero(self.cantidad * factor, self.moneda)
 ```
 
-Observa cómo:
-- Usamos `@dataclass(frozen=True)` para crear un objeto inmutable
+Se puede observar cómo:
+- Se usa `@dataclass(frozen=True)` para crear un objeto inmutable
 - Los métodos `sumar` y `multiplicar` devuelven nuevas instancias en lugar de modificar la existente
 - No hay campo de identidad
 
@@ -191,23 +181,17 @@ graph TD
         comp2 -.-> result2[true]
         comp3 -.-> result3[false]
     end
-    
-    style E1 fill:#f9d77e,stroke:#333,stroke-width:2px
-    style E2 fill:#f9d77e,stroke:#333,stroke-width:2px
-    style V1 fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style V2 fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style V3 fill:#a3c9a8,stroke:#333,stroke-width:2px
 ```
 
 ## Cuándo Usar Entidades vs. Objetos de Valor
 
-Usa una **Entidad** cuando:
+Se debe usar una **Entidad** cuando:
 - El objeto necesita ser rastreado a lo largo del tiempo
 - El objeto tiene una identidad distinta en el dominio
 - El mismo objeto puede cambiar con el tiempo mientras sigue siendo "el mismo"
-- Necesitas mantener un historial del objeto
+- Se necesita mantener un historial del objeto
 
-Usa un **Objeto de Valor** cuando:
+Se debe usar un **Objeto de Valor** cuando:
 - El objeto se define enteramente por sus atributos
 - La igualdad se determina comparando todos los atributos
 - El concepto es inmutable en el dominio
@@ -216,7 +200,7 @@ Usa un **Objeto de Valor** cuando:
 
 ## Ejemplo Práctico: Dominio de Comercio Electrónico
 
-Veamos cómo las entidades y los objetos de valor trabajan juntos en un escenario de comercio electrónico:
+A continuación se muestra cómo las entidades y los objetos de valor trabajan juntos en un escenario de comercio electrónico:
 
 ```python
 from dataclasses import dataclass
@@ -338,27 +322,22 @@ classDiagram
     Pedido -- Direccion
     Pedido -- LineaPedido
     LineaPedido -- Dinero
-    
-    style Pedido fill:#f9d77e,stroke:#333,stroke-width:2px
-    style Direccion fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style Dinero fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style LineaPedido fill:#a3c9a8,stroke:#333,stroke-width:2px
 ```
 
 ## Mejores Prácticas de Modelado de Dominio
 
 Al modelar con entidades y objetos de valor:
 
-1. **Comienza con el comportamiento, no con los datos**: Concéntrate en lo que hace el objeto en el dominio, no solo en qué datos contiene.
+1. **Comenzar con el comportamiento, no con los datos**: Concentrarse en lo que hace el objeto en el dominio, no solo en qué datos contiene.
 
-2. **Sé explícito sobre la identidad**: Para las entidades, identifica claramente qué las hace únicas en el dominio.
+2. **Ser explícito sobre la identidad**: Para las entidades, identificar claramente qué las hace únicas en el dominio.
 
-3. **Haz que los objetos de valor sean inmutables**: Esto asegura que se comporten correctamente y puedan compartirse de forma segura.
+3. **Hacer que los objetos de valor sean inmutables**: Esto asegura que se comporten correctamente y puedan compartirse de forma segura.
 
-4. **Considera el uso de métodos de fábrica**: Para lógica de creación de objetos compleja, especialmente para objetos de valor con validación.
+4. **Considerar el uso de métodos de fábrica**: Para lógica de creación de objetos compleja, especialmente para objetos de valor con validación.
 
-5. **Encapsula colecciones**: Cuando una entidad contiene una colección, no la expongas directamente; proporciona métodos que controlen cómo se agregan o eliminan elementos.
+5. **Encapsular colecciones**: Cuando una entidad contiene una colección, no exponerla directamente; proporcionar métodos que controlen cómo se agregan o eliminan elementos.
 
-6. **Usa objetos de valor para validación**: Pueden encapsular y hacer cumplir las reglas del dominio sobre valores específicos.
+6. **Usar objetos de valor para validación**: Pueden encapsular y hacer cumplir las reglas del dominio sobre valores específicos.
 
-Al utilizar correctamente entidades y objetos de valor, crearás modelos de dominio que son expresivos y mantienen su integridad a medida que la aplicación evoluciona. 
+Al utilizar correctamente entidades y objetos de valor, se crean modelos de dominio que son expresivos y mantienen su integridad a medida que la aplicación evoluciona. 

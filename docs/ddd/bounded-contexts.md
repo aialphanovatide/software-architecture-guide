@@ -33,18 +33,6 @@ graph LR
             I3[Almacén]
         end
     end
-    
-    style V1 fill:#f9d77e,stroke:#333,stroke-width:2px
-    style V2 fill:#f9d77e,stroke:#333,stroke-width:2px
-    style V3 fill:#f9d77e,stroke:#333,stroke-width:2px
-    
-    style E1 fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style E2 fill:#a3c9a8,stroke:#333,stroke-width:2px
-    style E3 fill:#a3c9a8,stroke:#333,stroke-width:2px
-    
-    style I1 fill:#84b1ed,stroke:#333,stroke-width:2px
-    style I2 fill:#84b1ed,stroke:#333,stroke-width:2px
-    style I3 fill:#84b1ed,stroke:#333,stroke-width:2px
 ```
 
 En cada contexto, algunos términos tienen significados diferentes:
@@ -82,30 +70,18 @@ graph TD
             C1[Libros]
             C2[Autores]
             C3[Categorías]
-            
-            style C1 fill:#FFD700,stroke:#333,stroke-width:2px
-            style C2 fill:#FFD700,stroke:#333,stroke-width:2px
-            style C3 fill:#FFD700,stroke:#333,stroke-width:2px
         end
         
         subgraph "Contexto de Préstamos"
             P1[Préstamos]
             P2[Reservas]
             P3[Ejemplares]
-            
-            style P1 fill:#90EE90,stroke:#333,stroke-width:2px
-            style P2 fill:#90EE90,stroke:#333,stroke-width:2px
-            style P3 fill:#90EE90,stroke:#333,stroke-width:2px
         end
         
         subgraph "Contexto de Membresías"
             M1[Usuarios]
             M2[Suscripciones]
             M3[Pagos]
-            
-            style M1 fill:#ADD8E6,stroke:#333,stroke-width:2px
-            style M2 fill:#ADD8E6,stroke:#333,stroke-width:2px
-            style M3 fill:#ADD8E6,stroke:#333,stroke-width:2px
         end
     end
 ```
@@ -204,15 +180,6 @@ graph TD
     SC --> DBC[(BD Catalogación)]
     SP --> DBP[(BD Préstamos)]
     SM --> DBM[(BD Membresías)]
-    
-    style Cliente fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
-    style Gateway fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
-    style SC fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style SP fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style SM fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style DBC fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
-    style DBP fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
-    style DBM fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
 ```
 
 ## Comunicación Entre Contextos Delimitados
@@ -246,10 +213,6 @@ sequenceDiagram
     C->>EB: Publica evento "LibroActualizado"
     EB->>P: Entrega evento "LibroActualizado"
     Note over P: Maneja el evento y actualiza<br>el estado de los ejemplares
-    
-    style C fill:#FFD700,stroke:#333,stroke-width:2px
-    style EB fill:#DDDDDD,stroke:#333,stroke-width:2px
-    style P fill:#90EE90,stroke:#333,stroke-width:2px
 ```
 
 Código de ejemplo:
@@ -291,11 +254,6 @@ graph LR
     subgraph "Contexto de Catalogación"
         API[API de Catalogación] --> CC[Código de Catalogación]
     end
-    
-    style PC fill:#90EE90,stroke:#333,stroke-width:2px
-    style AC fill:#FFA500,stroke:#333,stroke-width:2px
-    style API fill:#FFD700,stroke:#333,stroke-width:2px
-    style CC fill:#FFD700,stroke:#333,stroke-width:2px
 ```
 
 Código de ejemplo:
@@ -340,9 +298,6 @@ Existen diferentes tipos de relaciones entre contextos:
 ```mermaid
 graph LR
     A[Contexto A] <--> B[Contexto B]
-    
-    style A fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style B fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
 ```
 
 Dos equipos colaboran estrechamente, coordinando cambios.
@@ -356,10 +311,6 @@ graph TD
     A[Contexto A] --> SK
     B[Contexto B] --> SK
     SK[Núcleo Compartido]
-    
-    style A fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style B fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style SK fill:#f9d77e,stroke:#112d4e,stroke-width:2px
 ```
 
 Parte del modelo se comparte y mantiene conjuntamente.
@@ -371,9 +322,6 @@ Parte del modelo se comparte y mantiene conjuntamente.
 ```mermaid
 graph LR
     A[Contexto A<br>Cliente] --> B[Contexto B<br>Proveedor]
-    
-    style A fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style B fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
 ```
 
 Un contexto depende de los servicios proporcionados por otro.
@@ -385,9 +333,6 @@ Un contexto depende de los servicios proporcionados por otro.
 ```mermaid
 graph LR
     A[Contexto A<br>Conformista] -.-> B[Contexto B]
-    
-    style A fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style B fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
 ```
 
 Un contexto se adapta al modelo de otro sin poder influir en él.
@@ -412,17 +357,11 @@ graph TD
     P -.->|Conformista| I
     C -.->|Conformista| I
     M -.->|Conformista| I
-    
-    style C fill:#FFD700,stroke:#333,stroke-width:2px
-    style P fill:#90EE90,stroke:#333,stroke-width:2px
-    style M fill:#ADD8E6,stroke:#333,stroke-width:2px
-    style I fill:#D3D3D3,stroke:#333,stroke-width:2px
-    style N fill:#FFA07A,stroke:#333,stroke-width:2px
 ```
 
 ## Ejemplo Práctico Completo
 
-Veamos cómo interactúan los contextos en nuestro sistema de biblioteca:
+A continuación se muestra cómo interactúan los contextos en el sistema de biblioteca:
 
 ### Cuando un usuario toma prestado un libro:
 
@@ -514,15 +453,12 @@ Es importante entender que los contextos delimitados evolucionan con el tiempo:
 graph LR
     subgraph "Fase Inicial"
         A1[Gran Contexto<br>Monolítico]
-        style A1 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
     end
     
     subgraph "Fase de Madurez"
         B1[Contexto<br>de Ventas]
         B2[Contexto<br>de Envíos]
         B1 --- B2
-        style B1 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-        style B2 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
     end
     
     subgraph "Fase Avanzada"
@@ -535,11 +471,6 @@ graph LR
         C3 --- C4
         C1 -.-> C3
         C2 -.-> C3
-        
-        style C1 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-        style C2 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-        style C3 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-        style C4 fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
     end
     
     A1 ==> B1

@@ -477,4 +477,4 @@ def cargar_pedido(pedido_id):
 - Malla de servicios (Service Mesh) como Istio
 - Plataforma interna de desarrollo (Internal Developer Platform)
 
-La elección de la estrategia de despliegue correcta dependerá del tamaño del equipo, complejidad del sistema, y requisitos específicos de tu organización. 
+La elección de la estrategia de despliegue correcta dependerá del tamaño del equipo, complejidad del sistema, y requisitos específicos de la organización. 

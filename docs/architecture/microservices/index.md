@@ -78,19 +78,6 @@ graph TD
     Notification --> Email[Email Service]
     Notification --> SMS[SMS Service]
     Notification --> Push[Push Notifications]
-    
-    style Client fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
-    style API fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
-    style Auth fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style User fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Order fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Product fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Payment fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Notification fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style EventBus fill:#f9f7f7,stroke:#112d4e,stroke-width:2px
-    style Email fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
-    style SMS fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
-    style Push fill:#dbe2ef,stroke:#112d4e,stroke-width:2px
 ```
 
 ### Infraestructura y Servicios de Soporte
@@ -101,7 +88,6 @@ Este diagrama muestra la infraestructura común y cómo los servicios principale
 graph TD
     subgraph "Servicios Principales"
         Services[Microservicios]
-        style Services fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
     end
     
     subgraph "Infraestructura Común"
@@ -109,11 +95,6 @@ graph TD
         Discovery[Servicio de Descubrimiento]
         Monitoring[Monitoreo y Logging]
         Tracing[Distributed Tracing]
-        
-        style Config fill:#f9d77e,stroke:#112d4e,stroke-width:2px
-        style Discovery fill:#a3c9a8,stroke:#112d4e,stroke-width:2px
-        style Monitoring fill:#84b1ed,stroke:#112d4e,stroke-width:2px
-        style Tracing fill:#d998b3,stroke:#112d4e,stroke-width:2px
     end
     
     Services -. Obtiene configuración .-> Config
@@ -133,14 +114,6 @@ graph LR
     
     Order --> Product[Servicio de Productos]
     Order --> Payment[Servicio de Pagos]
-    
-    style Order fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Product fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Payment fill:#3f72af,stroke:#112d4e,stroke-width:2px,color:#ffffff
-    style Config fill:#f9d77e,stroke:#112d4e,stroke-width:2px
-    style Discovery fill:#a3c9a8,stroke:#112d4e,stroke-width:2px
-    style Monitoring fill:#84b1ed,stroke:#112d4e,stroke-width:2px
-    style Tracing fill:#d998b3,stroke:#112d4e,stroke-width:2px
 ```
 
 ## Estructura de Proyecto Típica para Microservicios
@@ -289,7 +262,7 @@ Sin embargo, pueden ser excesivos para:
 
 ## Microservicios en la Práctica
 
-En las siguientes secciones, exploraremos aspectos clave de la implementación de microservicios:
+En las siguientes secciones, se exploran aspectos clave de la implementación de microservicios:
 
 1. [Principios de Diseño](principles.md) - Guías para un diseño efectivo de microservicios
 2. [Patrones de Comunicación](communication.md) - Cómo interactúan los servicios entre sí
