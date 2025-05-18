@@ -1,109 +1,109 @@
-# Domain-Driven Design
+# Diseño Dirigido por el Dominio (DDD)
 
-Domain-Driven Design (DDD) is an approach to software development that places the primary focus on the core domain of the application. Introduced by Eric Evans in his book "Domain-Driven Design: Tackling Complexity in the Heart of Software," DDD provides both a philosophy and a set of patterns for creating software that accurately reflects the business domain it serves.
+El Diseño Dirigido por el Dominio (Domain-Driven Design o DDD) es un enfoque para el desarrollo de software que coloca el foco principal en el dominio central de la aplicación. Introducido por Eric Evans en su libro "Domain-Driven Design: Tackling Complexity in the Heart of Software", DDD proporciona tanto una filosofía como un conjunto de patrones para crear software que refleje con precisión el dominio de negocio al que sirve.
 
-## Core Concepts
+## Conceptos Fundamentales
 
-DDD shifts our focus from technical concerns to the business domain:
+DDD cambia nuestro enfoque de las preocupaciones técnicas al dominio de negocio:
 
-- We model our code to match the business domain
-- We use the language of domain experts in our code
-- We organize our system around domain concepts, not technical layers
-- We isolate complex domain logic to keep it pure and maintainable
+- Modelamos nuestro código para que coincida con el dominio de negocio
+- Utilizamos el lenguaje de los expertos del dominio en nuestro código
+- Organizamos nuestro sistema alrededor de conceptos del dominio, no de capas técnicas
+- Aislamos la lógica compleja del dominio para mantenerla pura y mantenible
 
-## Why Domain-Driven Design?
+## ¿Por qué usar Diseño Dirigido por el Dominio?
 
-DDD is particularly valuable when building software for complex domains where:
+DDD es particularmente valioso cuando se construye software para dominios complejos donde:
 
-- Business rules are numerous and nuanced
-- There's specialized domain knowledge
-- The domain evolves over time
-- Multiple stakeholders have different perspectives
-- Technical implementations could easily obscure domain logic
+- Las reglas de negocio son numerosas y con matices
+- Existe conocimiento especializado del dominio
+- El dominio evoluciona con el tiempo
+- Múltiples interesados tienen diferentes perspectivas
+- Las implementaciones técnicas podrían fácilmente oscurecer la lógica del dominio
 
-## Key Benefits
+## Beneficios Clave
 
-When implemented effectively, DDD provides:
+Cuando se implementa eficazmente, DDD proporciona:
 
-- **Improved communication** between developers and domain experts
-- **Better alignment** between code and business needs
-- **Clearer boundaries** between different parts of the system
-- **More maintainable** code that reflects real-world concepts
-- **Easier evolution** as business rules change
+- **Mejor comunicación** entre desarrolladores y expertos del dominio
+- **Mayor alineación** entre código y necesidades del negocio
+- **Límites más claros** entre diferentes partes del sistema
+- **Código más mantenible** que refleja conceptos del mundo real
+- **Evolución más sencilla** a medida que cambian las reglas de negocio
 
-## Core Concepts of DDD
+## Conceptos Clave de DDD
 
-DDD encompasses several key concepts that we'll explore in detail:
+DDD abarca varios conceptos clave que exploraremos en detalle:
 
-1. [**Ubiquitous Language**](ubiquitous-language.md) - A shared language between developers and domain experts
-2. [**Bounded Contexts**](bounded-contexts.md) - Explicit boundaries where models apply
-3. [**Entities and Value Objects**](entities-value-objects.md) - The building blocks of domain models
-4. [**Aggregates**](aggregates.md) - Clusters of related entities with clear boundaries
-5. [**Repositories**](repositories.md) - Methods for retrieving and persisting domain objects
-6. [**Domain Services**](domain-services.md) - Operations that don't naturally belong to entities
-7. [**Application Services**](application-services.md) - Orchestration of domain objects to perform use cases
+1. [**Lenguaje Ubicuo**](ubiquitous-language.md) - Un lenguaje compartido entre desarrolladores y expertos del dominio
+2. [**Contextos Delimitados**](bounded-contexts.md) - Límites explícitos donde se aplican los modelos
+3. [**Entidades y Objetos de Valor**](entities-value-objects.md) - Los bloques de construcción de los modelos de dominio
+4. [**Agregados**](aggregates.md) - Grupos de entidades relacionadas con límites claros
+5. [**Repositorios**](repositories.md) - Métodos para recuperar y persistir objetos del dominio
+6. [**Servicios de Dominio**](domain-services.md) - Operaciones que no pertenecen naturalmente a las entidades
+7. [**Servicios de Aplicación**](application-services.md) - Orquestación de objetos de dominio para realizar casos de uso
 
-## DDD in Practice
+## DDD en la Práctica
 
-The following Python example illustrates a simple domain model using DDD concepts:
+El siguiente ejemplo en Python ilustra un modelo de dominio simple utilizando conceptos de DDD:
 
 ```python
 from dataclasses import dataclass
 from typing import List, Optional
 
-# Value Object
+# Objeto de Valor
 @dataclass(frozen=True)
 class Email:
-    """Email value object with validation."""
-    address: str
+    """Objeto de valor de Email con validación."""
+    direccion: str
     
     def __post_init__(self):
-        if "@" not in self.address:
-            raise ValueError(f"Invalid email: {self.address}")
+        if "@" not in self.direccion:
+            raise ValueError(f"Email inválido: {self.direccion}")
 
-# Entity
-class User:
-    """User entity with unique identity."""
-    def __init__(self, user_id: int, name: str, email: Email):
-        self.id = user_id
-        self.name = name
+# Entidad
+class Usuario:
+    """Entidad Usuario con identidad única."""
+    def __init__(self, usuario_id: int, nombre: str, email: Email):
+        self.id = usuario_id
+        self.nombre = nombre
         self.email = email
     
-    def change_email(self, new_email: Email) -> None:
-        """Domain logic for changing email."""
-        if new_email.address == self.email.address:
-            raise ValueError("New email must be different")
-        self.email = new_email
+    def cambiar_email(self, nuevo_email: Email) -> None:
+        """Lógica de dominio para cambiar email."""
+        if nuevo_email.direccion == self.email.direccion:
+            raise ValueError("El nuevo email debe ser diferente")
+        self.email = nuevo_email
 
-# Repository (interface)
-class UserRepository:
-    """Repository for User access."""
-    def find_by_id(self, user_id: int) -> Optional[User]:
+# Repositorio (interfaz)
+class RepositorioUsuarios:
+    """Repositorio para acceso a Usuarios."""
+    def buscar_por_id(self, usuario_id: int) -> Optional[Usuario]:
         raise NotImplementedError
         
-    def save(self, user: User) -> None:
+    def guardar(self, usuario: Usuario) -> None:
         raise NotImplementedError
 
-# Application Service
-class UserService:
-    """Application service for user operations."""
-    def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
+# Servicio de Aplicación
+class ServicioUsuarios:
+    """Servicio de aplicación para operaciones de usuarios."""
+    def __init__(self, repositorio_usuarios: RepositorioUsuarios):
+        self.repositorio_usuarios = repositorio_usuarios
     
-    def change_user_email(self, user_id: int, new_email_str: str) -> None:
-        """Use case: Change a user's email address."""
-        user = self.user_repository.find_by_id(user_id)
-        if not user:
-            raise ValueError(f"User {user_id} not found")
+    def cambiar_email_usuario(self, usuario_id: int, nuevo_email_str: str) -> None:
+        """Caso de uso: Cambiar la dirección de email de un usuario."""
+        usuario = self.repositorio_usuarios.buscar_por_id(usuario_id)
+        if not usuario:
+            raise ValueError(f"Usuario {usuario_id} no encontrado")
             
-        # Create value object
-        new_email = Email(new_email_str)
+        # Crear objeto de valor
+        nuevo_email = Email(nuevo_email_str)
         
-        # Use domain logic
-        user.change_email(new_email)
+        # Usar lógica de dominio
+        usuario.cambiar_email(nuevo_email)
         
-        # Persist changes
-        self.user_repository.save(user)
+        # Persistir cambios
+        self.repositorio_usuarios.guardar(usuario)
 ```
 
-In the sections that follow, we'll explore each DDD concept in depth, with practical examples of how to apply them in Python and TypeScript backends. 
+En las secciones siguientes, exploraremos cada concepto de DDD en profundidad, con ejemplos prácticos de cómo aplicarlos en backends de Python y TypeScript. 
