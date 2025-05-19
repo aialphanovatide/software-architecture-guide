@@ -6,9 +6,96 @@
 > 
 > — Robert C. Martin
 
-## ¿Qué es?
+## ¿Qué es el DIP?
+El Principio de Inversión de Dependencias dice que el código principal de tu aplicación (la lógica de negocio) no debe depender directamente de detalles como bases de datos, servicios externos o librerías. En vez de eso, ambos deben depender de interfaces o abstracciones.
 
-El Principio de Inversión de Dependencias establece que los componentes de alto nivel (políticas de negocio, flujos de trabajo) no deben depender directamente de componentes de bajo nivel (implementaciones específicas, infraestructura). En cambio, ambos deben depender de abstracciones.
+---
+
+## Caso de uso: Notificaciones a usuarios
+
+Supón que tienes que enviar notificaciones a los usuarios cuando se registran. ¿Qué pasa si no aplicas DIP?
+
+### Problema (antes de DIP)
+
+```python
+class ServicioNotificacionEmail:
+    def enviar(self, destinatario, mensaje):
+        print(f"Enviando email a {destinatario}: {mensaje}")
+
+class GestorUsuarios:
+    def __init__(self):
+        self.notificador = ServicioNotificacionEmail()  # Dependencia directa
+    def registrar(self, email, nombre):
+        print(f"Usuario {nombre} registrado")
+        self.notificador.enviar(email, "¡Bienvenido!")
+```
+
+**¿Qué está mal aquí?**
+- `GestorUsuarios` depende directamente de una implementación concreta.
+- Si quieres cambiar a SMS o push, tienes que modificar la clase.
+- Es difícil de probar (no puedes simular el envío de emails fácilmente).
+
+---
+
+## ¿Por qué es un problema?
+- **Poco flexible:** Cambiar la forma de notificar requiere modificar el código principal.
+- **Difícil de probar:** No puedes usar mocks o stubs fácilmente.
+- **Acoplamiento fuerte:** El código de negocio depende de detalles técnicos.
+
+---
+
+## Solución: Aplicando DIP
+
+Creamos una interfaz para la notificación y hacemos que el gestor dependa de esa interfaz, no de la implementación concreta.
+
+```python
+from abc import ABC, abstractmethod
+
+class ServicioNotificacion(ABC):
+    @abstractmethod
+    def enviar(self, destinatario, mensaje):
+        pass
+
+class ServicioNotificacionEmail(ServicioNotificacion):
+    def enviar(self, destinatario, mensaje):
+        print(f"Enviando email a {destinatario}: {mensaje}")
+
+class ServicioNotificacionSMS(ServicioNotificacion):
+    def enviar(self, destinatario, mensaje):
+        print(f"Enviando SMS a {destinatario}: {mensaje}")
+
+class GestorUsuarios:
+    def __init__(self, notificador: ServicioNotificacion):
+        self.notificador = notificador  # Depende de la abstracción
+    def registrar(self, email, nombre):
+        print(f"Usuario {nombre} registrado")
+        self.notificador.enviar(email, "¡Bienvenido!")
+
+# Uso:
+gestor = GestorUsuarios(ServicioNotificacionEmail())
+gestor.registrar("ana@ejemplo.com", "Ana")
+
+gestor_sms = GestorUsuarios(ServicioNotificacionSMS())
+gestor_sms.registrar("123456789", "Juan")
+```
+
+**¿Qué mejoró?**
+- Puedes cambiar la forma de notificar sin tocar el código principal.
+- Es fácil de probar usando mocks.
+- El código es más flexible y mantenible.
+
+---
+
+## Checklist para aplicar DIP
+- [ ] ¿Tu lógica de negocio depende solo de interfaces o abstracciones?
+- [ ] ¿Puedes cambiar la implementación sin modificar el código principal?
+- [ ] ¿Puedes probar tu código usando mocks o stubs?
+- [ ] ¿Evitas crear instancias de servicios concretos dentro de tus clases principales?
+
+---
+
+## Resumen
+El DIP te ayuda a crear sistemas desacoplados y fáciles de probar. Si tu código principal depende de detalles técnicos, ¡es momento de introducir abstracciones!
 
 ## Visualización
 

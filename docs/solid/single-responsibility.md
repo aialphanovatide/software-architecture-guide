@@ -4,48 +4,50 @@
 > 
 > — Robert C. Martin
 
-## ¿Qué es?
+## ¿Qué es el SRP?
+El Principio de Responsabilidad Única dice que cada clase, función o módulo debe encargarse de una sola cosa. Si una clase hace muchas cosas, será difícil de entender, mantener y probar.
 
-El Principio de Responsabilidad Única establece que cada clase o módulo debe tener responsabilidad sobre una sola parte de la funcionalidad del software, y esta responsabilidad debe estar completamente encapsulada por la clase.
+---
 
-## ¿Por qué es importante?
+## Caso de uso: Registro de usuarios
 
-Cuando una clase asume múltiples responsabilidades:
-- Se vuelve más difícil de entender y mantener
-- Los cambios en una responsabilidad pueden afectar a otras
-- Es más difícil de reutilizar
-- Se vuelve más propensa a errores
+Imagina que tienes que crear una función para registrar usuarios en una aplicación. ¿Qué suele pasar si no aplicamos SRP?
 
-## Ejemplo problemático
+### Problema (antes de SRP)
 
 ```python
 class Usuario:
     def __init__(self, nombre, email):
         self.nombre = nombre
         self.email = email
-        
-    def validar_email(self):
-        # Lógica para validar email
-        return "@" in self.email
-        
-    def guardar_en_db(self):
-        # Lógica para conectar a la base de datos
-        # y guardar al usuario
+    
+    def registrar(self):
+        # 1. Validar email
+        if "@" not in self.email:
+            raise ValueError("Email inválido")
+        # 2. Guardar en la base de datos
         print(f"Guardando usuario {self.nombre} en la base de datos")
-        
-    def enviar_email_bienvenida(self):
-        # Lógica para conectar al servicio de email
-        # y enviar email de bienvenida
+        # 3. Enviar email de bienvenida
         print(f"Enviando email de bienvenida a {self.email}")
 ```
 
-Esta clase `Usuario` tiene múltiples responsabilidades:
-- Almacenar datos del usuario
-- Validar datos
-- Interactuar con la base de datos
-- Enviar comunicaciones
+**¿Qué está mal aquí?**
+- La clase `Usuario` valida emails, guarda en la base de datos y envía correos.
+- Si cambia la forma de validar emails, guardar datos o enviar correos, hay que modificar esta clase.
+- Es difícil de probar cada parte por separado.
 
-## Solución aplicando SRP
+---
+
+## ¿Por qué es un problema?
+- **Difícil de mantener:** Cambios en una parte pueden romper otras.
+- **Difícil de probar:** No puedes probar la validación sin tocar la base de datos o el email.
+- **Difícil de reutilizar:** No puedes usar la validación o el envío de emails en otros lugares fácilmente.
+
+---
+
+## Solución: Aplicando SRP
+
+Dividimos las responsabilidades en clases separadas:
 
 ```python
 class Usuario:
@@ -55,39 +57,41 @@ class Usuario:
 
 class ValidadorEmail:
     @staticmethod
-    def validar(email):
+    def es_valido(email):
         return "@" in email
 
 class RepositorioUsuarios:
     def guardar(self, usuario):
-        # Lógica para conectar a la base de datos y guardar
         print(f"Guardando usuario {usuario.nombre} en la base de datos")
 
 class ServicioEmail:
     def enviar_bienvenida(self, usuario):
-        # Lógica para enviar email
         print(f"Enviando email de bienvenida a {usuario.email}")
+
+# Uso:
+usuario = Usuario("Ana", "ana@ejemplo.com")
+if ValidadorEmail.es_valido(usuario.email):
+    repo = RepositorioUsuarios()
+    repo.guardar(usuario)
+    ServicioEmail().enviar_bienvenida(usuario)
+else:
+    print("Email inválido")
 ```
 
-## Beneficios de esta implementación
+**¿Qué mejoró?**
+- Cada clase tiene una sola responsabilidad.
+- Puedes cambiar la validación, la base de datos o el email sin tocar las otras clases.
+- Es más fácil de probar y mantener.
 
-- Cada clase tiene una única responsabilidad bien definida
-- Las clases son más fáciles de entender y mantener
-- Los cambios en una funcionalidad no afectan al resto
-- Las clases se pueden reutilizar en diferentes contextos
+---
 
-## Consideraciones prácticas
+## Checklist para aplicar SRP
+- [ ] ¿Tu clase o función hace solo una cosa?
+- [ ] ¿Puedes describir su propósito en una sola frase?
+- [ ] ¿Cambios en una parte del sistema requieren cambiar esta clase por más de una razón? (Si sí, separa responsabilidades)
+- [ ] ¿Puedes probar cada parte de forma independiente?
 
-- El tamaño no es lo importante; la cohesión y el propósito sí lo son
-- Una clase pequeña puede violar SRP si tiene múltiples responsabilidades
-- El contexto importa; lo que constituye una "responsabilidad" depende del dominio
+---
 
-## Detección de violaciones del SRP
-
-Señales de que una clase podría estar violando SRP:
-- Métodos que operan en diferentes partes del estado interno
-- La clase crece constantemente con nuevas funcionalidades
-- Dificultad para describir lo que hace la clase en una sola frase
-- La clase tiene muchas dependencias
-
-SRP es el fundamento de los principios SOLID y su correcta aplicación facilita la implementación de los demás principios. 
+## Resumen
+El SRP te ayuda a escribir código más limpio, fácil de mantener y menos propenso a errores. Si una clase o función empieza a crecer y a hacer muchas cosas, ¡es momento de dividirla! 
