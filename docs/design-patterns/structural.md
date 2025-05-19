@@ -7,6 +7,65 @@ Los patrones estructurales se ocupan de cómo se combinan las clases y los objet
 ### Propósito
 Permitir que interfaces incompatibles trabajen juntas, convirtiendo la interfaz de una clase en otra que el cliente espera.
 
+### Caso de uso: Integrar un API de pagos cripto con una interfaz de pagos tradicional
+Supón que tu plataforma SaaS acepta pagos tradicionales (tarjeta, PayPal) y ahora quieres aceptar pagos cripto, pero la API de cripto tiene una interfaz diferente.
+
+---
+
+### Problema (antes de Adapter)
+
+```python
+# Interfaz esperada por el sistema
+class ProcesadorPagoTradicional:
+    def pagar(self, monto):
+        pass
+
+# API de cripto con interfaz diferente
+class ApiPagoCripto:
+    def send_crypto(self, wallet, amount):
+        print(f"Enviando {amount} a la wallet {wallet}")
+        return True
+
+# El sistema espera usar 'pagar', pero la API cripto usa 'send_crypto'
+# No son compatibles directamente
+```
+
+**¿Qué está mal aquí?**
+- No puedes usar la API de cripto donde el sistema espera un procesador tradicional.
+- Tendrías que modificar el sistema o la API, lo que no es deseable.
+
+---
+
+### Solución: Aplicando Adapter
+
+```python
+# Adaptador que convierte la interfaz cripto a la tradicional
+class AdaptadorPagoCripto(ProcesadorPagoTradicional):
+    def __init__(self, api_cripto, wallet):
+        self.api_cripto = api_cripto
+        self.wallet = wallet
+    def pagar(self, monto):
+        return self.api_cripto.send_crypto(self.wallet, monto)
+
+# Uso
+api_cripto = ApiPagoCripto()
+adaptador = AdaptadorPagoCripto(api_cripto, "WALLET123")
+adaptador.pagar(50)  # Enviando 50 a la wallet WALLET123
+```
+
+**¿Qué mejoró?**
+- Puedes integrar la API cripto sin modificar el sistema ni la API.
+- El sistema puede tratar todos los procesadores de pago de la misma forma.
+- Facilita la extensión y el mantenimiento.
+
+---
+
+### Checklist para aplicar Adapter
+- [ ] ¿Tienes dos interfaces incompatibles que deben trabajar juntas?
+- [ ] ¿No puedes (o no quieres) modificar el código original?
+- [ ] ¿Necesitas reutilizar código existente en un nuevo contexto?
+- [ ] ¿Quieres mantener el sistema desacoplado de implementaciones externas?
+
 ### Cuándo usarlo
 - Cuando necesitas usar una clase existente pero su interfaz no coincide con la que necesitas
 - Para crear una clase reutilizable que coopere con clases que no tienen necesariamente interfaces compatibles
@@ -63,6 +122,105 @@ cliente.ejecutar()  # Recibidos datos en JSON: {'data': {'items': [1, 2]}}
 
 ### Propósito
 Separar una abstracción de su implementación para que ambas puedan variar independientemente.
+
+### Caso de uso: Métodos de envío y transportistas en e-commerce
+Supón que tu tienda online ofrece varios métodos de envío (normal, exprés, locker) y trabaja con diferentes transportistas (DHL, FedEx, Correo). Quieres poder combinar cualquier método con cualquier transportista, y que sea fácil agregar nuevos métodos o transportistas sin modificar el resto del sistema.
+
+---
+
+### Problema (antes de Bridge)
+
+```python
+class EnvioNormalDHL:
+    def enviar(self, pedido):
+        print(f"Enviando {pedido} por DHL normal")
+
+class EnvioNormalFedEx:
+    def enviar(self, pedido):
+        print(f"Enviando {pedido} por FedEx normal")
+
+class EnvioExpresDHL:
+    def enviar(self, pedido):
+        print(f"Enviando {pedido} por DHL exprés")
+
+# Si agregas un nuevo método o transportista, tienes que crear muchas clases nuevas
+```
+
+**¿Qué está mal aquí?**
+- El número de clases crece rápidamente (combinación de métodos x transportistas).
+- Es difícil mantener y extender el sistema.
+- No puedes agregar fácilmente nuevos métodos o transportistas.
+
+---
+
+### Solución: Aplicando Bridge
+
+```python
+from abc import ABC, abstractmethod
+
+# Implementación: Transportistas
+class Transportista(ABC):
+    @abstractmethod
+    def enviar(self, pedido, tipo_envio):
+        pass
+
+class DHL(Transportista):
+    def enviar(self, pedido, tipo_envio):
+        print(f"Enviando {pedido} por DHL ({tipo_envio})")
+
+class FedEx(Transportista):
+    def enviar(self, pedido, tipo_envio):
+        print(f"Enviando {pedido} por FedEx ({tipo_envio})")
+
+class Correo(Transportista):
+    def enviar(self, pedido, tipo_envio):
+        print(f"Enviando {pedido} por Correo ({tipo_envio})")
+
+# Abstracción: Métodos de envío
+class MetodoEnvio(ABC):
+    def __init__(self, transportista: Transportista):
+        self.transportista = transportista
+    @abstractmethod
+    def enviar(self, pedido):
+        pass
+
+class EnvioNormal(MetodoEnvio):
+    def enviar(self, pedido):
+        self.transportista.enviar(pedido, "normal")
+
+class EnvioExpres(MetodoEnvio):
+    def enviar(self, pedido):
+        self.transportista.enviar(pedido, "exprés")
+
+class EnvioLocker(MetodoEnvio):
+    def enviar(self, pedido):
+        self.transportista.enviar(pedido, "locker")
+
+# Uso
+pedido = "Pedido #1234"
+
+envio1 = EnvioNormal(DHL())
+envio1.enviar(pedido)  # Enviando Pedido #1234 por DHL (normal)
+
+envio2 = EnvioExpres(FedEx())
+envio2.enviar(pedido)  # Enviando Pedido #1234 por FedEx (exprés)
+
+envio3 = EnvioLocker(Correo())
+envio3.enviar(pedido)  # Enviando Pedido #1234 por Correo (locker)
+```
+
+**¿Qué mejoró?**
+- Puedes combinar cualquier método de envío con cualquier transportista.
+- Agregar nuevos métodos o transportistas es fácil y no afecta el resto del sistema.
+- El código es más limpio, flexible y mantenible.
+
+---
+
+### Checklist para aplicar Bridge
+- [ ] ¿Tienes dos dimensiones que pueden variar independientemente (por ejemplo, métodos y transportistas)?
+- [ ] ¿Quieres evitar una explosión de clases por combinaciones?
+- [ ] ¿Necesitas poder extender el sistema fácilmente en ambas dimensiones?
+- [ ] ¿Quieres mantener el código desacoplado y flexible?
 
 ### Cuándo usarlo
 - Cuando quieres evitar un enlace permanente entre una abstracción y su implementación
@@ -137,434 +295,468 @@ print(doc_imagen_pantalla.mostrar())   # Mostrando en pantalla: Imagen en /img/f
 ### Propósito
 Componer objetos en estructuras de árbol para representar jerarquías parte-todo. Permite a los clientes tratar objetos individuales y composiciones de objetos de manera uniforme.
 
-### Cuándo usarlo
-- Para representar jerarquías parte-todo de objetos
-- Para que los clientes puedan ignorar las diferencias entre composiciones de objetos y objetos individuales
-- Para estructuras recursivas como sistemas de archivos, menús, etc.
+### Caso de uso: Carrito de compras con productos y combos en e-commerce
+Supón que tu tienda online permite a los usuarios agregar productos simples y combos (agrupaciones de productos) al carrito. Quieres que el sistema trate ambos casos de la misma forma, para calcular el precio total, mostrar el contenido, etc.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Composite)
+
+```python
+class Producto:
+    def __init__(self, nombre, precio):
+        self.nombre = nombre
+        self.precio = precio
+
+# Si quieres combos, tienes que tratarlos aparte
+class Combo:
+    def __init__(self, nombre, productos):
+        self.nombre = nombre
+        self.productos = productos
+
+# Calcular el total requiere lógica especial para combos
+productos = [Producto("camisa", 20), Producto("pantalón", 30)]
+combo = Combo("Pack verano", [Producto("gafas", 15), Producto("gorra", 10)])
+carrito = productos + [combo]
+
+total = 0
+for item in carrito:
+    if isinstance(item, Producto):
+        total += item.precio
+    elif isinstance(item, Combo):
+        for prod in item.productos:
+            total += prod.precio
+```
+
+**¿Qué está mal aquí?**
+- El código del carrito se complica con condicionales.
+- Si agregas nuevos tipos de agrupaciones, tienes que modificar la lógica.
+- No puedes tratar productos y combos de forma uniforme.
+
+---
+
+### Solución: Aplicando Composite
 
 ```python
 from abc import ABC, abstractmethod
-from typing import List
 
-# Componente
-class Componente(ABC):
+class ItemCarrito(ABC):
     @abstractmethod
-    def operacion(self) -> str:
+    def precio(self):
         pass
-    
     @abstractmethod
-    def agregar(self, componente) -> None:
-        pass
-    
-    @abstractmethod
-    def eliminar(self, componente) -> None:
-        pass
-    
-    @abstractmethod
-    def es_compuesto(self) -> bool:
+    def mostrar(self, nivel=0):
         pass
 
-# Hoja
-class Archivo(Componente):
+class Producto(ItemCarrito):
+    def __init__(self, nombre, precio):
+        self.nombre = nombre
+        self._precio = precio
+    def precio(self):
+        return self._precio
+    def mostrar(self, nivel=0):
+        print("  " * nivel + f"Producto: {self.nombre} (${self._precio})")
+
+class Combo(ItemCarrito):
     def __init__(self, nombre):
         self.nombre = nombre
-    
-    def operacion(self) -> str:
-        return f"Archivo: {self.nombre}"
-    
-    def agregar(self, componente) -> None:
-        raise NotImplementedError("No se puede agregar a un archivo")
-    
-    def eliminar(self, componente) -> None:
-        raise NotImplementedError("No se puede eliminar de un archivo")
-    
-    def es_compuesto(self) -> bool:
-        return False
-
-# Compuesto
-class Directorio(Componente):
-    def __init__(self, nombre):
-        self.nombre = nombre
-        self.hijos: List[Componente] = []
-    
-    def operacion(self) -> str:
-        resultados = [f"Directorio: {self.nombre}"]
-        for hijo in self.hijos:
-            # Añadir sangría para visualizar la jerarquía
-            resultado_hijo = hijo.operacion()
-            resultados.append(f"  {resultado_hijo}")
-        return "\n".join(resultados)
-    
-    def agregar(self, componente) -> None:
-        self.hijos.append(componente)
-    
-    def eliminar(self, componente) -> None:
-        self.hijos.remove(componente)
-    
-    def es_compuesto(self) -> bool:
-        return True
+        self.items = []
+    def agregar(self, item):
+        self.items.append(item)
+    def precio(self):
+        return sum(item.precio() for item in self.items)
+    def mostrar(self, nivel=0):
+        print("  " * nivel + f"Combo: {self.nombre}")
+        for item in self.items:
+            item.mostrar(nivel + 1)
 
 # Uso
-archivo1 = Archivo("documento.txt")
-archivo2 = Archivo("imagen.jpg")
-archivo3 = Archivo("datos.csv")
+camisa = Producto("camisa", 20)
+pantalon = Producto("pantalón", 30)
+gafas = Producto("gafas", 15)
+gorra = Producto("gorra", 10)
 
-directorio1 = Directorio("Documentos")
-directorio1.agregar(archivo1)
+combo_verano = Combo("Pack verano")
+combo_verano.agregar(gafas)
+combo_verano.agregar(gorra)
 
-directorio2 = Directorio("Imágenes")
-directorio2.agregar(archivo2)
+carrito = [camisa, pantalon, combo_verano]
 
-directorio_raiz = Directorio("Raíz")
-directorio_raiz.agregar(directorio1)
-directorio_raiz.agregar(directorio2)
-directorio_raiz.agregar(archivo3)
+total = sum(item.precio() for item in carrito)
+print(f"Total: ${total}")
 
-print(directorio_raiz.operacion())
-# Salida:
-# Directorio: Raíz
-#   Directorio: Documentos
-#     Archivo: documento.txt
-#   Directorio: Imágenes
-#     Archivo: imagen.jpg
-#   Archivo: datos.csv
+print("Contenido del carrito:")
+for item in carrito:
+    item.mostrar()
 ```
 
-### Consideraciones
-- Simplifica el código del cliente al tratar colecciones y objetos individuales de manera uniforme
-- Facilita añadir nuevos tipos de componentes
-- Puede hacer el diseño demasiado general
+**¿Qué mejoró?**
+- Puedes tratar productos y combos de la misma forma.
+- El código es más limpio y fácil de extender.
+- Puedes anidar combos dentro de combos si lo necesitas.
+
+---
+
+### Checklist para aplicar Composite
+- [ ] ¿Tienes objetos individuales y agrupaciones que quieres tratar igual?
+- [ ] ¿Quieres evitar condicionales para distinguir tipos?
+- [ ] ¿Necesitas estructuras jerárquicas (parte-todo)?
+- [ ] ¿Quieres que el sistema sea fácil de extender con nuevos tipos de agrupaciones?
 
 ## 4. Decorator (Decorador)
 
 ### Propósito
 Añadir responsabilidades adicionales a un objeto dinámicamente. Los decoradores proporcionan una alternativa flexible a la herencia para extender la funcionalidad.
 
-### Cuándo usarlo
-- Para añadir responsabilidades a objetos individuales dinámicamente, sin afectar a otros objetos
-- Para funcionalidades que pueden ser retiradas
-- Cuando la extensión por herencia es impráctica por ser demasiado compleja o tener demasiadas subclases
+### Caso de uso: Añadir funcionalidades extra a un pedido en e-commerce
+Supón que tu tienda online permite a los usuarios agregar servicios extra a su pedido: seguimiento premium, seguro, envoltorio de regalo, etc. Quieres que los usuarios puedan combinar estos extras de forma flexible, sin crear una clase diferente para cada combinación.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Decorator)
+
+```python
+class Pedido:
+    def __init__(self, descripcion):
+        self.descripcion = descripcion
+    def procesar(self):
+        print(f"Procesando pedido: {self.descripcion}")
+
+class PedidoConSeguimiento(Pedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando seguimiento premium")
+
+class PedidoConSeguro(Pedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando seguro")
+
+# Si quieres combinar extras, tienes que crear más subclases
+class PedidoConSeguimientoYSeguro(Pedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando seguimiento premium")
+        print("Agregando seguro")
+```
+
+**¿Qué está mal aquí?**
+- El número de subclases crece rápidamente si hay muchas combinaciones.
+- Es difícil mantener y extender el sistema.
+- No puedes añadir o quitar extras dinámicamente.
+
+---
+
+### Solución: Aplicando Decorator
 
 ```python
 from abc import ABC, abstractmethod
 
-# Componente
-class Notificacion(ABC):
+class Pedido(ABC):
     @abstractmethod
-    def enviar(self, mensaje: str) -> str:
+    def procesar(self):
         pass
 
-# Componente concreto
-class NotificacionBasica(Notificacion):
-    def enviar(self, mensaje: str) -> str:
-        return f"Notificación: {mensaje}"
+class PedidoBase(Pedido):
+    def __init__(self, descripcion):
+        self.descripcion = descripcion
+    def procesar(self):
+        print(f"Procesando pedido: {self.descripcion}")
 
-# Decorador base
-class DecoradorNotificacion(Notificacion):
-    def __init__(self, notificacion_envuelta: Notificacion):
-        self.notificacion_envuelta = notificacion_envuelta
-    
-    def enviar(self, mensaje: str) -> str:
-        return self.notificacion_envuelta.enviar(mensaje)
+class DecoradorPedido(Pedido):
+    def __init__(self, pedido: Pedido):
+        self.pedido = pedido
+    def procesar(self):
+        self.pedido.procesar()
 
-# Decoradores concretos
-class NotificacionSMS(DecoradorNotificacion):
-    def enviar(self, mensaje: str) -> str:
-        return f"SMS: {self.notificacion_envuelta.enviar(mensaje)}"
+class SeguimientoPremium(DecoradorPedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando seguimiento premium")
 
-class NotificacionEmail(DecoradorNotificacion):
-    def enviar(self, mensaje: str) -> str:
-        return f"Email: {self.notificacion_envuelta.enviar(mensaje)}"
+class SeguroEnvio(DecoradorPedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando seguro de envío")
 
-class NotificacionPush(DecoradorNotificacion):
-    def enviar(self, mensaje: str) -> str:
-        return f"Push: {self.notificacion_envuelta.enviar(mensaje)}"
+class EnvoltorioRegalo(DecoradorPedido):
+    def procesar(self):
+        super().procesar()
+        print("Agregando envoltorio de regalo")
 
 # Uso
-notificacion = NotificacionBasica()
-print(notificacion.enviar("¡Alerta!"))  # Notificación: ¡Alerta!
-
-notificacion_sms = NotificacionSMS(notificacion)
-print(notificacion_sms.enviar("¡Alerta!"))  # SMS: Notificación: ¡Alerta!
-
-notificacion_email_sms = NotificacionEmail(notificacion_sms)
-print(notificacion_email_sms.enviar("¡Alerta!"))  # Email: SMS: Notificación: ¡Alerta!
-
-# Podemos combinar decoradores de diferentes maneras
-notificacion_completa = NotificacionPush(NotificacionEmail(NotificacionSMS(NotificacionBasica())))
-print(notificacion_completa.enviar("¡Alerta!"))  # Push: Email: SMS: Notificación: ¡Alerta!
+pedido = PedidoBase("Pedido #1234")
+pedido = SeguimientoPremium(pedido)
+pedido = SeguroEnvio(pedido)
+pedido = EnvoltorioRegalo(pedido)
+pedido.procesar()
+# Procesando pedido: Pedido #1234
+# Agregando seguimiento premium
+# Agregando seguro de envío
+# Agregando envoltorio de regalo
 ```
 
-### Consideraciones
-- Más flexible que la herencia
-- Permite añadir o retirar responsabilidades en tiempo de ejecución
-- Evita clases sobrecargadas de características en lo alto de la jerarquía
-- Puede resultar en muchos objetos pequeños y complicar la depuración
+**¿Qué mejoró?**
+- Puedes añadir o quitar extras dinámicamente.
+- No necesitas crear una subclase para cada combinación.
+- El código es más flexible y fácil de mantener.
+
+---
+
+### Checklist para aplicar Decorator
+- [ ] ¿Quieres añadir funcionalidades extra a objetos individuales?
+- [ ] ¿Quieres evitar una explosión de subclases?
+- [ ] ¿Necesitas añadir o quitar responsabilidades en tiempo de ejecución?
+- [ ] ¿Quieres mantener el sistema flexible y extensible?
 
 ## 5. Facade (Fachada)
 
 ### Propósito
 Proporcionar una interfaz unificada a un conjunto de interfaces en un subsistema. Define una interfaz de alto nivel que hace que el subsistema sea más fácil de usar.
 
-### Cuándo usarlo
-- Para proporcionar una interfaz simple a un subsistema complejo
-- Para desacoplar un subsistema de sus clientes
-- Para introducir una capa entre capas de software
+### Caso de uso: Simplificar el proceso de checkout en e-commerce
+Supón que tu tienda online tiene subsistemas separados para procesar pagos, gestionar envíos y generar facturas. El proceso de checkout es complejo y requiere coordinar varias operaciones. Quieres que el frontend o el backend de la app pueda hacer un solo llamado para realizar el checkout completo, sin preocuparse por los detalles internos.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Facade)
 
 ```python
-# Subsistema complejo
-class SistemaAudio:
-    def configurar_volumen(self, nivel):
-        return f"Volumen configurado a {nivel}%"
-    
-    def configurar_ecualizacion(self, bajos, medios, agudos):
-        return f"Ecualización: bajos={bajos}, medios={medios}, agudos={agudos}"
-    
-    def encender(self):
-        return "Sistema de audio encendido"
-    
-    def apagar(self):
-        return "Sistema de audio apagado"
+class ProcesadorPagos:
+    def pagar(self, pedido, tarjeta):
+        print(f"Pagando {pedido} con tarjeta {tarjeta}")
 
-class SistemaVideo:
-    def configurar_resolucion(self, resolucion):
-        return f"Resolución configurada a {resolucion}"
-    
-    def configurar_brillo(self, brillo):
-        return f"Brillo configurado a {brillo}%"
-    
-    def encender(self):
-        return "Sistema de video encendido"
-    
-    def apagar(self):
-        return "Sistema de video apagado"
+class GestorEnvios:
+    def enviar(self, pedido, direccion):
+        print(f"Enviando {pedido} a {direccion}")
 
-class SistemaLuces:
-    def atenuar(self, nivel):
-        return f"Luces atenuadas a {nivel}%"
-    
-    def configurar_color(self, color):
-        return f"Color de luces configurado a {color}"
-    
-    def encender(self):
-        return "Sistema de luces encendido"
-    
-    def apagar(self):
-        return "Sistema de luces apagado"
+class GeneradorFacturas:
+    def facturar(self, pedido):
+        print(f"Generando factura para {pedido}")
 
-# Fachada
-class SistemaCineEnCasa:
-    def __init__(self):
-        self.audio = SistemaAudio()
-        self.video = SistemaVideo()
-        self.luces = SistemaLuces()
-    
-    def ver_pelicula(self, pelicula):
-        resultados = []
-        resultados.append(self.audio.encender())
-        resultados.append(self.video.encender())
-        resultados.append(self.luces.encender())
-        
-        resultados.append(self.audio.configurar_volumen(70))
-        resultados.append(self.audio.configurar_ecualizacion(80, 50, 60))
-        resultados.append(self.video.configurar_resolucion("4K"))
-        resultados.append(self.video.configurar_brillo(80))
-        resultados.append(self.luces.atenuar(30))
-        resultados.append(self.luces.configurar_color("azul tenue"))
-        
-        resultados.append(f"¡Disfrutando de la película {pelicula}!")
-        return "\n".join(resultados)
-    
-    def finalizar_pelicula(self):
-        resultados = []
-        resultados.append(self.audio.apagar())
-        resultados.append(self.video.apagar())
-        resultados.append(self.luces.configurar_color("blanco"))
-        resultados.append(self.luces.atenuar(100))
-        return "\n".join(resultados)
+# El cliente debe coordinar todo manualmente
+procesador = ProcesadorPagos()
+gestor = GestorEnvios()
+generador = GeneradorFacturas()
 
-# Uso
-sistema_cine = SistemaCineEnCasa()
-print(sistema_cine.ver_pelicula("El Padrino"))
-print("\nFin de la película:\n")
-print(sistema_cine.finalizar_pelicula())
+pedido = "Pedido #1234"
+procesador.pagar(pedido, "1234-5678-9012-3456")
+gestor.enviar(pedido, "Calle Falsa 123")
+generador.facturar(pedido)
 ```
 
-### Consideraciones
-- Simplifica el uso de subsistemas complejos
-- Promueve el bajo acoplamiento entre el cliente y los subsistemas
-- Puede convertirse en un objeto "dios" que hace demasiado
+**¿Qué está mal aquí?**
+- El cliente debe conocer y coordinar todos los subsistemas.
+- Si cambia la lógica interna, hay que modificar el cliente.
+- El código es difícil de mantener y propenso a errores.
+
+---
+
+### Solución: Aplicando Facade
+
+```python
+class CheckoutFacade:
+    def __init__(self):
+        self.procesador = ProcesadorPagos()
+        self.gestor = GestorEnvios()
+        self.generador = GeneradorFacturas()
+    def realizar_checkout(self, pedido, tarjeta, direccion):
+        self.procesador.pagar(pedido, tarjeta)
+        self.gestor.enviar(pedido, direccion)
+        self.generador.facturar(pedido)
+        print("Checkout completo!")
+
+# Uso
+checkout = CheckoutFacade()
+checkout.realizar_checkout("Pedido #1234", "1234-5678-9012-3456", "Calle Falsa 123")
+# Pagando Pedido #1234 con tarjeta 1234-5678-9012-3456
+# Enviando Pedido #1234 a Calle Falsa 123
+# Generando factura para Pedido #1234
+# Checkout completo!
+```
+
+**¿Qué mejoró?**
+- El cliente solo interactúa con una interfaz simple.
+- Los detalles internos están encapsulados.
+- El sistema es más fácil de mantener y extender.
+
+---
+
+### Checklist para aplicar Facade
+- [ ] ¿Tienes un subsistema complejo con muchas operaciones?
+- [ ] ¿Quieres simplificar la interacción para el cliente?
+- [ ] ¿Quieres desacoplar el cliente de los detalles internos?
+- [ ] ¿Necesitas una interfaz de alto nivel para coordinar varias operaciones?
 
 ## 6. Proxy
 
 ### Propósito
 Proporcionar un sustituto o marcador de posición para otro objeto para controlar el acceso a él.
 
-### Cuándo usarlo
-- Para control de acceso (Proxy de protección)
-- Para cargar objetos pesados solo cuando sea necesario (Proxy virtual)
-- Para añadir funcionalidad adicional al acceder a un objeto (Proxy inteligente)
-- Para conexiones remotas (Proxy remoto)
+### Caso de uso: Carga diferida de imágenes de productos en una galería de e-commerce
+Supón que tu tienda online muestra una galería con muchas imágenes de productos. Cargar todas las imágenes grandes de inmediato puede hacer que la página sea lenta. Quieres que las imágenes solo se carguen cuando el usuario realmente las ve (lazy loading), pero sin cambiar la forma en que el resto del sistema accede a ellas.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Proxy)
+
+```python
+class ImagenProducto:
+    def __init__(self, archivo):
+        print(f"Cargando imagen {archivo}...")
+        self.archivo = archivo
+    def mostrar(self):
+        print(f"Mostrando imagen {self.archivo}")
+
+# Todas las imágenes se cargan al crear la galería
+imagenes = [ImagenProducto(f"img_{i}.jpg") for i in range(1, 4)]
+for img in imagenes:
+    img.mostrar()
+```
+
+**¿Qué está mal aquí?**
+- Todas las imágenes se cargan aunque el usuario no las vea.
+- El tiempo de carga inicial es alto.
+- Se consumen recursos innecesariamente.
+
+---
+
+### Solución: Aplicando Proxy
 
 ```python
 from abc import ABC, abstractmethod
 import time
 
-# Sujeto
 class Imagen(ABC):
     @abstractmethod
-    def mostrar(self) -> str:
+    def mostrar(self):
         pass
 
-# Sujeto real
 class ImagenReal(Imagen):
     def __init__(self, archivo):
+        print(f"Cargando imagen {archivo}...")
+        time.sleep(1)  # Simula carga pesada
         self.archivo = archivo
-        self._cargar_desde_disco()
-    
-    def _cargar_desde_disco(self):
-        # Simular carga de imagen pesada
-        print(f"Cargando imagen {self.archivo}...")
-        time.sleep(1)  # Simulación de tiempo de carga
-        print(f"Imagen {self.archivo} cargada.")
-    
-    def mostrar(self) -> str:
-        return f"Mostrando imagen {self.archivo}"
+    def mostrar(self):
+        print(f"Mostrando imagen {self.archivo}")
 
-# Proxy
 class ProxyImagen(Imagen):
     def __init__(self, archivo):
         self.archivo = archivo
         self.imagen_real = None
-    
-    def mostrar(self) -> str:
-        # Cargar la imagen sólo cuando sea necesario
+    def mostrar(self):
         if self.imagen_real is None:
             self.imagen_real = ImagenReal(self.archivo)
-        
-        return self.imagen_real.mostrar()
+        self.imagen_real.mostrar()
 
 # Uso
-imagenes = [
-    ProxyImagen("imagen1.jpg"),
-    ProxyImagen("imagen2.jpg"),
-    ProxyImagen("imagen3.jpg")
-]
-
-# Las imágenes no se cargan hasta que se llama a mostrar
+imagenes = [ProxyImagen(f"img_{i}.jpg") for i in range(1, 4)]
 print("Galería iniciada, pero las imágenes aún no se han cargado.")
 
-# Primera imagen mostrada - se cargará desde el disco
-print(imagenes[0].mostrar())
-
-# La misma imagen mostrada de nuevo - no se carga de nuevo
-print(imagenes[0].mostrar())
-
-# Otra imagen mostrada - se cargará desde el disco
-print(imagenes[2].mostrar())
+# Solo se carga la imagen cuando se muestra
+imagenes[0].mostrar()  # Carga y muestra img_1.jpg
+imagenes[0].mostrar()  # Solo muestra, no vuelve a cargar
+imagenes[2].mostrar()  # Carga y muestra img_3.jpg
 ```
 
-### Consideraciones
-- Permite controlar el acceso al objeto original sin que los clientes lo sepan
-- Puede mejorar el rendimiento mediante la carga diferida
-- Añade una capa de indirección que puede impactar el rendimiento en accesos frecuentes
+**¿Qué mejoró?**
+- Las imágenes solo se cargan cuando se necesitan.
+- El tiempo de carga inicial es bajo.
+- Se ahorran recursos y la experiencia de usuario mejora.
+
+---
+
+### Checklist para aplicar Proxy
+- [ ] ¿Quieres controlar el acceso a un objeto costoso o sensible?
+- [ ] ¿Necesitas cargar recursos solo cuando se usan realmente?
+- [ ] ¿Quieres añadir lógica extra (caché, control de acceso, logging) sin cambiar el objeto real?
+- [ ] ¿Quieres mantener la misma interfaz para el cliente?
 
 ## 7. Flyweight (Peso Ligero)
 
 ### Propósito
 Utilizar compartición para soportar grandes cantidades de objetos de granularidad fina eficientemente.
 
-### Cuándo usarlo
-- Cuando una aplicación utiliza un gran número de objetos
-- Cuando los costos de almacenamiento son altos debido a la cantidad de objetos
-- Cuando la mayoría del estado de los objetos puede ser externalizado
-- Cuando muchos grupos de objetos pueden ser reemplazados por relativamente pocos objetos compartidos
+### Caso de uso: Compartir atributos comunes entre productos en un catálogo grande de e-commerce
+Supón que tu tienda online tiene miles de productos, muchos de los cuales comparten atributos como color, talla, marca o etiquetas. Si cada producto almacena una copia de estos atributos, el consumo de memoria puede ser muy alto. Quieres compartir estos datos entre productos que los tengan en común.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Flyweight)
 
 ```python
-import json
-from typing import Dict
-
-# Flyweight
-class CaracterFlyweight:
-    def __init__(self, tipo_fuente, tamaño, color):
-        self.tipo_fuente = tipo_fuente
-        self.tamaño = tamaño
+class Producto:
+    def __init__(self, nombre, color, talla, marca):
+        self.nombre = nombre
         self.color = color
-    
-    def renderizar(self, texto, posicion_x, posicion_y):
-        return f"Renderizando '{texto}' en ({posicion_x}, {posicion_y}) con {self.tipo_fuente}, tamaño {self.tamaño}, color {self.color}"
+        self.talla = talla
+        self.marca = marca
 
-# Fábrica Flyweight
-class FabricaCaracteres:
-    def __init__(self):
-        self.caracteres: Dict[str, CaracterFlyweight] = {}
-    
-    def obtener_caracter(self, tipo_fuente, tamaño, color):
-        # Crear una clave para el flyweight
-        clave = json.dumps([tipo_fuente, tamaño, color])
-        
-        # Si no existe, crear un nuevo flyweight
-        if clave not in self.caracteres:
-            self.caracteres[clave] = CaracterFlyweight(tipo_fuente, tamaño, color)
-            print(f"Creando nuevo estilo de caracter: {clave}")
-        else:
-            print(f"Reutilizando estilo de caracter: {clave}")
-        
-        return self.caracteres[clave]
-    
-    def contar_caracteres(self):
-        return len(self.caracteres)
-
-# Cliente
-class Editor:
-    def __init__(self):
-        self.fabrica = FabricaCaracteres()
-        self.caracteres = []
-    
-    def agregar_caracter(self, texto, posicion_x, posicion_y, tipo_fuente, tamaño, color):
-        caracter = self.fabrica.obtener_caracter(tipo_fuente, tamaño, color)
-        self.caracteres.append((caracter, texto, posicion_x, posicion_y))
-    
-    def renderizar_documento(self):
-        resultados = []
-        for caracter, texto, posicion_x, posicion_y in self.caracteres:
-            resultados.append(caracter.renderizar(texto, posicion_x, posicion_y))
-        return "\n".join(resultados)
-
-# Uso
-editor = Editor()
-
-# Agregar caracteres con diferentes estilos
-editor.agregar_caracter("H", 10, 10, "Arial", 12, "Negro")
-editor.agregar_caracter("o", 20, 10, "Arial", 12, "Negro")
-editor.agregar_caracter("l", 30, 10, "Arial", 12, "Negro")
-editor.agregar_caracter("a", 40, 10, "Arial", 12, "Negro")
-
-# Agregar caracteres con diferentes estilos
-editor.agregar_caracter("M", 10, 20, "Times New Roman", 14, "Rojo")
-editor.agregar_caracter("u", 20, 20, "Times New Roman", 14, "Rojo")
-editor.agregar_caracter("n", 30, 20, "Times New Roman", 14, "Rojo")
-editor.agregar_caracter("d", 40, 20, "Times New Roman", 14, "Rojo")
-editor.agregar_caracter("o", 50, 20, "Times New Roman", 14, "Rojo")
-
-print(f"Número de estilos de caracteres únicos: {editor.fabrica.contar_caracteres()}")
-print(editor.renderizar_documento())
+# Cada producto almacena su propia copia de los atributos
+productos = [
+    Producto("Camiseta A", "rojo", "M", "Nike"),
+    Producto("Camiseta B", "rojo", "M", "Nike"),
+    Producto("Camiseta C", "azul", "L", "Adidas"),
+]
 ```
 
-### Consideraciones
-- Reduce la huella de memoria cuando se tienen muchos objetos similares
-- Puede introducir complejidad para gestionar el estado extrínseco
-- Requiere identificar claramente qué partes del estado pueden compartirse
+**¿Qué está mal aquí?**
+- Se duplican los mismos datos muchas veces en memoria.
+- El sistema es ineficiente si hay miles de productos similares.
+- No se aprovecha la compartición de datos comunes.
+
+---
+
+### Solución: Aplicando Flyweight
+
+```python
+class AtributosCompartidos:
+    def __init__(self, color, talla, marca):
+        self.color = color
+        self.talla = talla
+        self.marca = marca
+
+class FlyweightFactory:
+    _flyweights = {}
+    @classmethod
+    def obtener(cls, color, talla, marca):
+        clave = (color, talla, marca)
+        if clave not in cls._flyweights:
+            cls._flyweights[clave] = AtributosCompartidos(color, talla, marca)
+        return cls._flyweights[clave]
+
+class Producto:
+    def __init__(self, nombre, atributos):
+        self.nombre = nombre
+        self.atributos = atributos
+    def mostrar(self):
+        print(f"{self.nombre} - Color: {self.atributos.color}, Talla: {self.atributos.talla}, Marca: {self.atributos.marca}")
+
+# Uso
+productos = [
+    Producto("Camiseta A", FlyweightFactory.obtener("rojo", "M", "Nike")),
+    Producto("Camiseta B", FlyweightFactory.obtener("rojo", "M", "Nike")),
+    Producto("Camiseta C", FlyweightFactory.obtener("azul", "L", "Adidas")),
+]
+
+for p in productos:
+    p.mostrar()
+
+print(f"Atributos únicos en memoria: {len(FlyweightFactory._flyweights)}")
+```
+
+**¿Qué mejoró?**
+- Los atributos comunes se comparten entre productos.
+- El consumo de memoria es mucho menor.
+- El sistema es más eficiente y escalable.
+
+---
+
+### Checklist para aplicar Flyweight
+- [ ] ¿Tienes muchos objetos similares que comparten datos?
+- [ ] ¿Quieres reducir el consumo de memoria?
+- [ ] ¿Los datos compartidos pueden ser inmutables?
+- [ ] ¿Necesitas manejar grandes volúmenes de objetos eficientemente?
 
 ## Selección del patrón estructural adecuado
 

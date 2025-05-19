@@ -116,96 +116,79 @@ estacion.establecer_mediciones(26.8, 70.0, 990.5)
 ### Propósito
 Definir una familia de algoritmos, encapsular cada uno, y hacerlos intercambiables. Permite que el algoritmo varíe independientemente de los clientes que lo utilizan.
 
-### Cuándo usarlo
-- Cuando necesitas diferentes variantes de un algoritmo
-- Para aislar la lógica del negocio de los detalles de implementación del algoritmo
-- Cuando una clase tiene múltiples comportamientos que aparecen como múltiples declaraciones condicionales
+### Caso de uso: Cálculo dinámico de comisión (tarjeta, cripto, etc.)
+Supón que tu plataforma SaaS cobra comisión por cada pago y el cálculo depende del método (tarjeta, PayPal, cripto). Quieres poder cambiar la lógica de comisión fácilmente.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Strategy)
+
+```python
+class CalculadoraComision:
+    def calcular(self, metodo, monto):
+        if metodo == "tarjeta":
+            return monto * 0.03
+        elif metodo == "paypal":
+            return monto * 0.04
+        elif metodo == "cripto":
+            return monto * 0.01
+        # Si agregas un nuevo método, tienes que modificar esta clase
+```
+
+**¿Qué está mal aquí?**
+- Cada vez que agregas un nuevo método, tienes que modificar la clase.
+- El código se llena de condicionales y es difícil de mantener.
+- No puedes cambiar la lógica de comisión en tiempo de ejecución.
+
+---
+
+### Solución: Aplicando Strategy
 
 ```python
 from abc import ABC, abstractmethod
 
-# Estrategia
-class EstrategiaPago(ABC):
+class EstrategiaComision(ABC):
     @abstractmethod
-    def pagar(self, cantidad: float) -> str:
+    def calcular(self, monto):
         pass
 
-# Estrategias concretas
-class PagoTarjetaCredito(EstrategiaPago):
-    def __init__(self, numero: str, nombre: str, fecha_expiracion: str, cvv: str):
-        self.numero = numero
-        self.nombre = nombre
-        self.fecha_expiracion = fecha_expiracion
-        self.cvv = cvv
-    
-    def pagar(self, cantidad: float) -> str:
-        return f"Pago de ${cantidad} realizado con tarjeta de crédito terminada en {self.numero[-4:]}"
+class ComisionTarjeta(EstrategiaComision):
+    def calcular(self, monto):
+        return monto * 0.03
 
-class PagoPayPal(EstrategiaPago):
-    def __init__(self, email: str, password: str):
-        self.email = email
-        self.password = password
-    
-    def pagar(self, cantidad: float) -> str:
-        return f"Pago de ${cantidad} realizado con PayPal usando la cuenta {self.email}"
+class ComisionPaypal(EstrategiaComision):
+    def calcular(self, monto):
+        return monto * 0.04
 
-class PagoTransferenciaBancaria(EstrategiaPago):
-    def __init__(self, cuenta_bancaria: str):
-        self.cuenta_bancaria = cuenta_bancaria
-    
-    def pagar(self, cantidad: float) -> str:
-        return f"Pago de ${cantidad} realizado mediante transferencia a la cuenta {self.cuenta_bancaria}"
+class ComisionCripto(EstrategiaComision):
+    def calcular(self, monto):
+        return monto * 0.01
 
-# Contexto
-class CarritoCompra:
-    def __init__(self):
-        self.items = []
-        self.estrategia_pago = None
-    
-    def agregar_item(self, item, precio):
-        self.items.append({"item": item, "precio": precio})
-    
-    def calcular_total(self):
-        return sum(item["precio"] for item in self.items)
-    
-    def establecer_estrategia_pago(self, estrategia_pago: EstrategiaPago):
-        self.estrategia_pago = estrategia_pago
-    
-    def pagar(self):
-        if not self.estrategia_pago:
-            raise Exception("No se ha establecido una estrategia de pago")
-        
-        total = self.calcular_total()
-        return self.estrategia_pago.pagar(total)
+class CalculadoraComision:
+    def __init__(self, estrategia: EstrategiaComision):
+        self.estrategia = estrategia
+    def calcular(self, monto):
+        return self.estrategia.calcular(monto)
 
 # Uso
-carrito = CarritoCompra()
-carrito.agregar_item("Laptop", 1200.0)
-carrito.agregar_item("Auriculares", 100.0)
-carrito.agregar_item("Mouse", 50.0)
-
-print(f"Total a pagar: ${carrito.calcular_total()}")
-
-# El cliente decide pagar con tarjeta de crédito
-carrito.establecer_estrategia_pago(PagoTarjetaCredito("1234567890123456", "Juan Pérez", "12/25", "123"))
-print(carrito.pagar())
-
-# O podría pagar con PayPal
-carrito.establecer_estrategia_pago(PagoPayPal("juan.perez@example.com", "password"))
-print(carrito.pagar())
-
-# O podría pagar con transferencia bancaria
-carrito.establecer_estrategia_pago(PagoTransferenciaBancaria("ES1234567890"))
-print(carrito.pagar())
+calc = CalculadoraComision(ComisionTarjeta())
+print(calc.calcular(100))  # 3.0
+calc.estrategia = ComisionCripto()
+print(calc.calcular(100))  # 1.0
 ```
 
-### Consideraciones
-- Facilita el intercambio de algoritmos en tiempo de ejecución
-- Elimina declaraciones condicionales
-- Proporciona alternativas a la herencia para variar comportamientos
-- Puede introducir objetos adicionales
+**¿Qué mejoró?**
+- Puedes cambiar la lógica de comisión en tiempo de ejecución.
+- Agregar nuevos métodos no requiere modificar la calculadora.
+- El código es más limpio y fácil de mantener.
+
+---
+
+### Checklist para aplicar Strategy
+- [ ] ¿Tienes varias formas de realizar una operación (algoritmos)?
+- [ ] ¿Quieres poder cambiar el algoritmo en tiempo de ejecución?
+- [ ] ¿Quieres evitar condicionales grandes y repetitivos?
+- [ ] ¿Necesitas que el código sea fácil de extender y mantener?
 
 ## 3. Command (Comando)
 

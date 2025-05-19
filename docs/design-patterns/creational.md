@@ -7,77 +7,66 @@ Los patrones creacionales proporcionan diferentes mecanismos para crear objetos,
 ### Propósito
 Garantizar que una clase tenga una única instancia y proporcionar un punto de acceso global a ella.
 
-### Cuándo usarlo
-- Cuando debe haber exactamente una instancia de una clase
-- Cuando se necesita un punto de acceso global y controlado
-- Para recursos compartidos como conexiones a bases de datos, pools de objetos o configuraciones
+### Caso de uso: Conexión a base de datos
+Supón que tienes una aplicación SaaS y necesitas que toda la app use una sola conexión a la base de datos para evitar problemas de recursos y mantener la eficiencia.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Singleton)
 
 ```python
-class Singleton:
+class ConexionDB:
+    def __init__(self):
+        print("Conectando a la base de datos...")
+
+# Cada vez que creas una instancia, se abre una nueva conexión
+conn1 = ConexionDB()  # Conectando a la base de datos...
+conn2 = ConexionDB()  # Conectando a la base de datos...
+```
+
+**¿Qué está mal aquí?**
+- Se crean múltiples conexiones innecesarias.
+- Puede saturar la base de datos y consumir recursos.
+- No hay un punto de acceso global ni control.
+
+---
+
+### Solución: Aplicando Singleton
+
+```python
+class ConexionDB:
     _instancia = None
-    
+
     def __new__(cls):
         if cls._instancia is None:
+            print("Conectando a la base de datos...")
             cls._instancia = super().__new__(cls)
         return cls._instancia
-    
-    def __init__(self):
-        # La inicialización se ejecutará cada vez, pero solo
-        # hay una instancia.
-        if not hasattr(self, 'inicializado'):
-            self.inicializado = True
-            self.datos = []
-    
-    def agregar_dato(self, dato):
-        self.datos.append(dato)
-        
-    def obtener_datos(self):
-        return self.datos
+
+    def query(self, sql):
+        print(f"Ejecutando: {sql}")
 
 # Uso
-s1 = Singleton()
-s1.agregar_dato("datos 1")
-
-s2 = Singleton()  # Devuelve la misma instancia
-print(s2.obtener_datos())  # ['datos 1']
+conn1 = ConexionDB()  # Conectando a la base de datos...
+conn2 = ConexionDB()  # No vuelve a conectar
+print(conn1 is conn2)  # True
+conn1.query("SELECT * FROM users;")
 ```
 
-### Ejemplo en TypeScript
+**¿Qué mejoró?**
+- Solo se crea una conexión a la base de datos.
+- Todos los módulos usan la misma instancia.
+- Mejor uso de recursos y control global.
 
-```typescript
-class Singleton {
-    private static instance: Singleton;
-    private data: string[] = [];
-    
-    private constructor() {
-        // Constructor privado para evitar instanciación directa
-    }
-    
-    public static getInstance(): Singleton {
-        if (!Singleton.instance) {
-            Singleton.instance = new Singleton();
-        }
-        return Singleton.instance;
-    }
-    
-    public addData(item: string): void {
-        this.data.push(item);
-    }
-    
-    public getData(): string[] {
-        return this.data;
-    }
-}
+---
 
-// Uso
-const s1 = Singleton.getInstance();
-s1.addData("datos 1");
+### Checklist para aplicar Singleton
+- [ ] ¿Solo debe existir una instancia de la clase?
+- [ ] ¿Necesitas un punto de acceso global?
+- [ ] ¿El recurso es costoso o compartido (DB, logger, etc.)?
+- [ ] ¿Evitas crear instancias adicionales accidentalmente?
 
-const s2 = Singleton.getInstance();
-console.log(s2.getData());  // ['datos 1']
-```
+---
 
 ### Consideraciones
 - Puede dificultar las pruebas unitarias
@@ -90,74 +79,137 @@ console.log(s2.getData());  // ['datos 1']
 ### Propósito
 Definir una interfaz para crear un objeto, pero dejar que las subclases decidan qué clase instanciar.
 
-### Cuándo usarlo
-- Cuando una clase no puede anticipar la clase de objetos que debe crear
-- Cuando una clase quiere que sus subclases especifiquen los objetos que crean
-- Cuando las clases delegan responsabilidad a una de varias subclases auxiliares
+### Caso de uso: Notificaciones en un e-commerce
+Supón que tu tienda online quiere enviar notificaciones a los usuarios por diferentes canales: email, SMS o push. Cada canal tiene su propia lógica, pero el sistema debe ser fácil de extender si agregas nuevos canales.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Factory Method)
+
+```python
+class Notificador:
+    def enviar(self, tipo, mensaje):
+        if tipo == "email":
+            print(f"Enviando email: {mensaje}")
+        elif tipo == "sms":
+            print(f"Enviando SMS: {mensaje}")
+        elif tipo == "push":
+            print(f"Enviando push: {mensaje}")
+        # Si agregas un nuevo canal, tienes que modificar esta clase
+```
+
+**¿Qué está mal aquí?**
+- Cada vez que agregas un nuevo canal, tienes que modificar la clase.
+- El código se llena de condicionales y es difícil de mantener.
+- No puedes cambiar la lógica de notificación en tiempo de ejecución.
+
+---
+
+### Solución: Aplicando Factory Method
 
 ```python
 from abc import ABC, abstractmethod
 
 # Producto abstracto
-class Documento(ABC):
+class Notificacion(ABC):
     @abstractmethod
-    def crear(self):
+    def enviar(self, mensaje):
         pass
 
 # Productos concretos
-class DocumentoPDF(Documento):
-    def crear(self):
-        return "Creando PDF"
+class NotificacionEmail(Notificacion):
+    def enviar(self, mensaje):
+        print(f"Enviando email: {mensaje}")
 
-class DocumentoWord(Documento):
-    def crear(self):
-        return "Creando DOCX"
+class NotificacionSMS(Notificacion):
+    def enviar(self, mensaje):
+        print(f"Enviando SMS: {mensaje}")
+
+class NotificacionPush(Notificacion):
+    def enviar(self, mensaje):
+        print(f"Enviando push: {mensaje}")
 
 # Creador abstracto
-class CreadorDocumento(ABC):
+class CreadorNotificacion(ABC):
     @abstractmethod
     def factory_method(self):
         pass
-    
-    def operacion(self):
-        documento = self.factory_method()
-        resultado = documento.crear()
-        return resultado
+    def notificar(self, mensaje):
+        notificacion = self.factory_method()
+        notificacion.enviar(mensaje)
 
 # Creadores concretos
-class CreadorPDF(CreadorDocumento):
+class CreadorEmail(CreadorNotificacion):
     def factory_method(self):
-        return DocumentoPDF()
+        return NotificacionEmail()
 
-class CreadorWord(CreadorDocumento):
+class CreadorSMS(CreadorNotificacion):
     def factory_method(self):
-        return DocumentoWord()
+        return NotificacionSMS()
+
+class CreadorPush(CreadorNotificacion):
+    def factory_method(self):
+        return NotificacionPush()
 
 # Uso
-creador_pdf = CreadorPDF()
-print(creador_pdf.operacion())  # "Creando PDF"
+creador = CreadorEmail()
+creador.notificar("Tu pedido fue enviado")  # Enviando email: Tu pedido fue enviado
 
-creador_word = CreadorWord()
-print(creador_word.operacion())  # "Creando DOCX"
+creador = CreadorSMS()
+creador.notificar("Tu pedido fue entregado")  # Enviando SMS: Tu pedido fue entregado
+
+creador = CreadorPush()
+creador.notificar("¡Tienes una nueva oferta!")  # Enviando push: ¡Tienes una nueva oferta!
 ```
 
-### Consideraciones
-- Introduce flexibilidad para extender el sistema con nuevos tipos de productos
-- El código se vuelve más complejo debido a la jerarquía de clases
+**¿Qué mejoró?**
+- Puedes agregar nuevos canales sin modificar el código existente.
+- El código es más limpio y fácil de mantener.
+- Puedes cambiar la lógica de notificación en tiempo de ejecución.
+
+---
+
+### Checklist para aplicar Factory Method
+- [ ] ¿Tienes diferentes formas de crear un objeto según el contexto?
+- [ ] ¿Quieres evitar condicionales grandes y repetitivos?
+- [ ] ¿Necesitas que el sistema sea fácil de extender con nuevos tipos de objetos?
+- [ ] ¿Quieres delegar la creación de objetos a subclases?
 
 ## 3. Abstract Factory
 
 ### Propósito
 Proporcionar una interfaz para crear familias de objetos relacionados o dependientes sin especificar sus clases concretas.
 
-### Cuándo usarlo
-- Cuando un sistema debe ser independiente de cómo se crean sus productos
-- Cuando un sistema debe trabajar con múltiples familias de productos
-- Cuando se desea proporcionar una biblioteca de productos y solo revelar sus interfaces
+### Caso de uso: Interfaces de usuario para web y móvil en una app de pagos
+Supón que tu app de pagos necesita mostrar botones y formularios adaptados a web y móvil. Quieres que el sistema sea fácil de extender si agregas nuevas plataformas.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Abstract Factory)
+
+```python
+class UIFactory:
+    def crear_boton(self, plataforma):
+        if plataforma == "web":
+            return "Botón web"
+        elif plataforma == "movil":
+            return "Botón móvil"
+    def crear_formulario(self, plataforma):
+        if plataforma == "web":
+            return "Formulario web"
+        elif plataforma == "movil":
+            return "Formulario móvil"
+# Si agregas una nueva plataforma, tienes que modificar la clase
+```
+
+**¿Qué está mal aquí?**
+- Cada vez que agregas una nueva plataforma, tienes que modificar la clase.
+- El código se llena de condicionales y es difícil de mantener.
+- No puedes cambiar la familia de componentes en tiempo de ejecución.
+
+---
+
+### Solución: Aplicando Abstract Factory
 
 ```python
 from abc import ABC, abstractmethod
@@ -165,240 +217,240 @@ from abc import ABC, abstractmethod
 # Productos abstractos
 class Boton(ABC):
     @abstractmethod
-    def pintar(self):
+    def render(self):
         pass
 
-class CajadeTexto(ABC):
+class Formulario(ABC):
     @abstractmethod
-    def pintar(self):
+    def render(self):
         pass
 
-# Productos concretos - Familia Windows
-class BotonWindows(Boton):
-    def pintar(self):
-        return "Botón estilo Windows"
+# Productos concretos para web
+class BotonWeb(Boton):
+    def render(self):
+        return "Botón web"
 
-class CajaTextoWindows(CajadeTexto):
-    def pintar(self):
-        return "Caja de texto estilo Windows"
+class FormularioWeb(Formulario):
+    def render(self):
+        return "Formulario web"
 
-# Productos concretos - Familia macOS
-class BotonMacOS(Boton):
-    def pintar(self):
-        return "Botón estilo macOS"
+# Productos concretos para móvil
+class BotonMovil(Boton):
+    def render(self):
+        return "Botón móvil"
 
-class CajaTextoMacOS(CajadeTexto):
-    def pintar(self):
-        return "Caja de texto estilo macOS"
+class FormularioMovil(Formulario):
+    def render(self):
+        return "Formulario móvil"
 
 # Fábrica abstracta
-class FabricaUI(ABC):
+class UIFactory(ABC):
     @abstractmethod
     def crear_boton(self):
         pass
-    
     @abstractmethod
-    def crear_caja_texto(self):
+    def crear_formulario(self):
         pass
 
 # Fábricas concretas
-class FabricaUIWindows(FabricaUI):
+class WebFactory(UIFactory):
     def crear_boton(self):
-        return BotonWindows()
-    
-    def crear_caja_texto(self):
-        return CajaTextoWindows()
+        return BotonWeb()
+    def crear_formulario(self):
+        return FormularioWeb()
 
-class FabricaUIMacOS(FabricaUI):
+class MovilFactory(UIFactory):
     def crear_boton(self):
-        return BotonMacOS()
-    
-    def crear_caja_texto(self):
-        return CajaTextoMacOS()
+        return BotonMovil()
+    def crear_formulario(self):
+        return FormularioMovil()
 
 # Cliente
-class Aplicacion:
-    def __init__(self, fabrica):
-        self.fabrica = fabrica
-        self.boton = None
-        self.caja_texto = None
-    
-    def crear_ui(self):
-        self.boton = self.fabrica.crear_boton()
-        self.caja_texto = self.fabrica.crear_caja_texto()
-    
-    def pintar(self):
-        return [self.boton.pintar(), self.caja_texto.pintar()]
+class AppPagos:
+    def __init__(self, factory: UIFactory):
+        self.boton = factory.crear_boton()
+        self.formulario = factory.crear_formulario()
+    def mostrar_ui(self):
+        print(self.boton.render())
+        print(self.formulario.render())
 
 # Uso
-app_windows = Aplicacion(FabricaUIWindows())
-app_windows.crear_ui()
-print(app_windows.pintar())  # ["Botón estilo Windows", "Caja de texto estilo Windows"]
+app_web = AppPagos(WebFactory())
+app_web.mostrar_ui()  # Botón web, Formulario web
 
-app_macos = Aplicacion(FabricaUIMacOS())
-app_macos.crear_ui()
-print(app_macos.pintar())  # ["Botón estilo macOS", "Caja de texto estilo macOS"]
+app_movil = AppPagos(MovilFactory())
+app_movil.mostrar_ui()  # Botón móvil, Formulario móvil
 ```
 
-### Consideraciones
-- Facilita el intercambio de familias de productos
-- Promueve la consistencia entre productos
-- Agregar nuevos productos puede ser complicado, ya que implica modificar la interfaz de la fábrica
+**¿Qué mejoró?**
+- Puedes agregar nuevas plataformas sin modificar el código existente.
+- El código es más limpio y fácil de mantener.
+- Puedes cambiar la familia de componentes en tiempo de ejecución.
+
+---
+
+### Checklist para aplicar Abstract Factory
+- [ ] ¿Necesitas crear familias de objetos relacionados?
+- [ ] ¿Quieres evitar condicionales grandes y repetitivos?
+- [ ] ¿El sistema debe ser fácil de extender con nuevas familias de productos?
+- [ ] ¿Quieres desacoplar la creación de objetos de su uso?
 
 ## 4. Builder
 
 ### Propósito
 Separar la construcción de un objeto complejo de su representación, de modo que el mismo proceso de construcción pueda crear diferentes representaciones.
 
-### Cuándo usarlo
-- Cuando el proceso de construcción debe permitir diferentes representaciones del objeto construido
-- Cuando el algoritmo para crear un objeto complejo debe ser independiente de las partes y de cómo se ensamblan
-- Cuando la construcción de un objeto requiere muchos parámetros, algunos opcionales
+### Caso de uso: Construcción de órdenes de compra personalizadas en un e-commerce
+Supón que tu tienda online permite a los usuarios crear órdenes de compra con diferentes opciones: productos, cupones, envío exprés, regalo, etc. El proceso puede ser complejo y variar según el cliente.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Builder)
 
 ```python
-class Hamburguesa:
-    def __init__(self):
-        self.pan = None
-        self.carne = None
-        self.lechuga = False
-        self.tomate = False
-        self.queso = False
-        self.cebolla = False
-    
-    def __str__(self):
-        ingredientes = [self.pan, self.carne]
-        if self.lechuga:
-            ingredientes.append("lechuga")
-        if self.tomate:
-            ingredientes.append("tomate")
-        if self.queso:
-            ingredientes.append("queso")
-        if self.cebolla:
-            ingredientes.append("cebolla")
-        return f"Hamburguesa con {', '.join(ingredientes)}"
+class Orden:
+    def __init__(self, productos, cupon=None, envio=None, regalo=False):
+        self.productos = productos
+        self.cupon = cupon
+        self.envio = envio
+        self.regalo = regalo
 
-class ConstructorHamburguesa:
-    def __init__(self):
-        self.hamburguesa = Hamburguesa()
-    
-    def reset(self):
-        self.hamburguesa = Hamburguesa()
-        return self
-    
-    def con_pan(self, tipo):
-        self.hamburguesa.pan = tipo
-        return self
-    
-    def con_carne(self, tipo):
-        self.hamburguesa.carne = tipo
-        return self
-    
-    def con_lechuga(self):
-        self.hamburguesa.lechuga = True
-        return self
-    
-    def con_tomate(self):
-        self.hamburguesa.tomate = True
-        return self
-    
-    def con_queso(self):
-        self.hamburguesa.queso = True
-        return self
-    
-    def con_cebolla(self):
-        self.hamburguesa.cebolla = True
-        return self
-    
-    def build(self):
-        resultado = self.hamburguesa
-        self.reset()
-        return resultado
-
-# Uso
-constructor = ConstructorHamburguesa()
-
-hamburguesa_clasica = constructor.con_pan("blanco") \
-                               .con_carne("res") \
-                               .con_lechuga() \
-                               .con_tomate() \
-                               .build()
-
-hamburguesa_queso = constructor.con_pan("integral") \
-                              .con_carne("pollo") \
-                              .con_queso() \
-                              .build()
-
-print(hamburguesa_clasica)  # Hamburguesa con pan blanco, carne de res, lechuga, tomate
-print(hamburguesa_queso)    # Hamburguesa con pan integral, carne de pollo, queso
+# Crear una orden con muchas combinaciones puede ser confuso
+orden1 = Orden(["camisa", "pantalón"])
+orden2 = Orden(["camisa"], cupon="DESCUENTO10", envio="exprés", regalo=True)
 ```
 
-### Consideraciones
-- Permite crear diferentes representaciones del mismo objeto
-- Aísla el código de construcción del código de representación
-- Proporciona control sobre el proceso de construcción
+**¿Qué está mal aquí?**
+- El constructor tiene muchos parámetros opcionales.
+- Es fácil cometer errores al pasar los argumentos.
+- El código es difícil de leer y mantener.
+
+---
+
+### Solución: Aplicando Builder
+
+```python
+class Orden:
+    def __init__(self):
+        self.productos = []
+        self.cupon = None
+        self.envio = None
+        self.regalo = False
+    def __str__(self):
+        return f"Orden: productos={self.productos}, cupon={self.cupon}, envio={self.envio}, regalo={self.regalo}"
+
+class OrdenBuilder:
+    def __init__(self):
+        self.orden = Orden()
+    def agregar_producto(self, producto):
+        self.orden.productos.append(producto)
+        return self
+    def con_cupon(self, cupon):
+        self.orden.cupon = cupon
+        return self
+    def con_envio(self, tipo):
+        self.orden.envio = tipo
+        return self
+    def como_regalo(self):
+        self.orden.regalo = True
+        return self
+    def build(self):
+        return self.orden
+
+# Uso
+builder = OrdenBuilder()
+orden1 = builder.agregar_producto("camisa").agregar_producto("pantalón").build()
+orden2 = builder.agregar_producto("camisa").con_cupon("DESCUENTO10").con_envio("exprés").como_regalo().build()
+
+print(orden1)  # Orden: productos=['camisa', 'pantalón'], cupon=None, envio=None, regalo=False
+print(orden2)  # Orden: productos=['camisa', 'pantalón', 'camisa'], cupon=DESCUENTO10, envio=exprés, regalo=True
+```
+
+**¿Qué mejoró?**
+- El proceso de construcción es claro y flexible.
+- Puedes crear diferentes combinaciones fácilmente.
+- El código es más legible y menos propenso a errores.
+
+---
+
+### Checklist para aplicar Builder
+- [ ] ¿El objeto a construir es complejo y tiene muchas opciones?
+- [ ] ¿Quieres evitar constructores con muchos parámetros?
+- [ ] ¿Necesitas diferentes representaciones del mismo objeto?
+- [ ] ¿Quieres que el proceso de construcción sea claro y paso a paso?
 
 ## 5. Prototype
 
 ### Propósito
 Permite crear nuevos objetos copiando un objeto existente, conocido como prototipo.
 
-### Cuándo usarlo
-- Cuando las clases a instanciar se especifican en tiempo de ejecución
-- Para evitar construir una jerarquía de fábricas paralela a la jerarquía de productos
-- Cuando las instancias de una clase pueden tener solo unas pocas combinaciones de estado
+### Caso de uso: Clonar plantillas de productos para vendedores en un marketplace
+Supón que en un marketplace (tipo Mercado Libre) los vendedores pueden crear plantillas de productos y luego clonarlas para nuevos productos similares, ahorrando tiempo y evitando errores.
 
-### Ejemplo en Python
+---
+
+### Problema (antes de Prototype)
+
+```python
+class Producto:
+    def __init__(self, nombre, precio, categoria, descripcion):
+        self.nombre = nombre
+        self.precio = precio
+        self.categoria = categoria
+        self.descripcion = descripcion
+
+# Si quieres crear un producto similar, tienes que copiar todo manualmente
+producto1 = Producto("Zapatillas", 100, "Calzado", "Zapatillas deportivas")
+producto2 = Producto(producto1.nombre, producto1.precio, producto1.categoria, producto1.descripcion)
+producto2.nombre = "Zapatillas edición limitada"
+```
+
+**¿Qué está mal aquí?**
+- Copiar manualmente es propenso a errores.
+- Si cambias la estructura de Producto, tienes que actualizar todos los lugares donde se copia.
+- No es eficiente ni escalable.
+
+---
+
+### Solución: Aplicando Prototype
 
 ```python
 import copy
 
-class Prototipo:
-    def __init__(self):
-        self.objetos = {}
-    
-    def registrar_objeto(self, nombre, objeto):
-        self.objetos[nombre] = objeto
-    
-    def anular_registro(self, nombre):
-        del self.objetos[nombre]
-    
-    def clonar(self, nombre, **atributos):
-        obj = copy.deepcopy(self.objetos.get(nombre))
-        if not obj:
-            raise ValueError(f"Prototipo {nombre} no encontrado")
-        
-        # Personalizar el clon con atributos adicionales
-        obj.__dict__.update(atributos)
-        return obj
-
-class Documento:
-    def __init__(self, nombre, contenido):
+class Producto:
+    def __init__(self, nombre, precio, categoria, descripcion):
         self.nombre = nombre
-        self.contenido = contenido
-    
+        self.precio = precio
+        self.categoria = categoria
+        self.descripcion = descripcion
     def __str__(self):
-        return f"Documento: {self.nombre}, Contenido: {self.contenido}"
+        return f"Producto: {self.nombre}, Precio: {self.precio}, Categoría: {self.categoria}, Desc: {self.descripcion}"
+    def clonar(self, **atributos):
+        nuevo = copy.deepcopy(self)
+        nuevo.__dict__.update(atributos)
+        return nuevo
 
 # Uso
-registro = Prototipo()
-doc_original = Documento("template", "Este es un documento plantilla")
-registro.registrar_objeto("doc_basico", doc_original)
+plantilla = Producto("Zapatillas", 100, "Calzado", "Zapatillas deportivas")
+producto1 = plantilla.clonar(nombre="Zapatillas edición limitada", precio=120)
+producto2 = plantilla.clonar(nombre="Zapatillas niño", precio=80)
 
-# Crear clones con modificaciones
-doc1 = registro.clonar("doc_basico", nombre="Reporte 1", contenido="Contenido del reporte 1")
-doc2 = registro.clonar("doc_basico", nombre="Reporte 2")
-
-print(doc1)  # Documento: Reporte 1, Contenido: Contenido del reporte 1
-print(doc2)  # Documento: Reporte 2, Contenido: Este es un documento plantilla
+print(producto1)  # Producto: Zapatillas edición limitada, Precio: 120, Categoría: Calzado, Desc: Zapatillas deportivas
+print(producto2)  # Producto: Zapatillas niño, Precio: 80, Categoría: Calzado, Desc: Zapatillas deportivas
 ```
 
-### Consideraciones
-- Reduce la necesidad de subclases
-- Permite agregar o eliminar objetos en tiempo de ejecución
-- Proporciona una alternativa a la herencia para variar el comportamiento
-- En lenguajes modernos, puede preferirse usar mecanismos nativos de clonación
+**¿Qué mejoró?**
+- Puedes clonar productos fácilmente y personalizarlos.
+- Menos errores y código más limpio.
+- Si cambias la estructura, solo actualizas la clase.
+
+---
+
+### Checklist para aplicar Prototype
+- [ ] ¿Necesitas crear muchos objetos similares?
+- [ ] ¿Quieres evitar copiar y pegar código?
+- [ ] ¿El proceso de creación es costoso o complejo?
+- [ ] ¿Quieres permitir la personalización rápida de objetos clonados?
 
 ## Selección del patrón creacional adecuado
 

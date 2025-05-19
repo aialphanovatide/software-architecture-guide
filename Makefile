@@ -1,15 +1,15 @@
 .PHONY: docker-build docker-up docker-down docker-logs start restart help
 
-docker-build:
+build:
 	docker-compose build
 
-docker-up:
+up:
 	docker-compose up -d
 
-docker-down:
+down:
 	docker-compose down
 
-docker-logs:
+logs:
 	docker-compose logs -f
 
 # Combined commands
@@ -21,9 +21,9 @@ restart: docker-down docker-up
 
 help:
 	@echo "Available commands:"
-	@echo "  docker-build   : Build Docker image"
-	@echo "  docker-up      : Start Docker container"
-	@echo "  docker-down    : Stop Docker container"
-	@echo "  docker-logs    : View Docker logs"
+	@echo "  build          : Build Docker image"
+	@echo "  up             : Start Docker container"
+	@echo "  down           : Stop Docker container"
+	@echo "  logs           : View Docker logs"
 	@echo "  start          : Build and start Docker container"
 	@echo "  restart        : Restart Docker container" 
