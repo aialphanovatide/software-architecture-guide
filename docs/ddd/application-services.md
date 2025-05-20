@@ -4,6 +4,12 @@ Los servicios de aplicación son responsables de orquestar los casos de uso del 
 
 ---
 
+## El Papel de los DTOs
+
+Los servicios de aplicación trabajan con [DTOs (Data Transfer Objects)](data-transfer-objects.md) para comunicarse con el mundo exterior. Los DTOs permiten proteger el modelo de dominio y optimizar el intercambio de datos entre capas.
+
+---
+
 ## Problema Real: Gestión de Wallets en una Plataforma Financiera
 
 En una plataforma financiera, los usuarios pueden tener varias billeteras (wallets) en diferentes monedas. Los servicios de aplicación deben permitir:
@@ -52,23 +58,9 @@ sequenceDiagram
 from uuid import UUID, uuid4
 from decimal import Decimal
 from typing import Dict
-from pydantic import BaseModel
 
-# DTOs
-class CreateWalletDTO(BaseModel):
-    user_id: UUID
-    organization_id: UUID
-
-class TransferFundsDTO(BaseModel):
-    from_wallet_id: UUID
-    to_wallet_id: UUID
-    amount: Decimal
-    currency_code: str
-
-class TopUpDTO(BaseModel):
-    wallet_id: UUID
-    amount: Decimal
-    currency_code: str
+# Importamos los DTOs desde otro módulo
+from .dtos import CreateWalletDTO, TransferFundsDTO, TopUpDTO
 
 # Entidad y repositorio simplificados
 class Wallet:
@@ -138,24 +130,8 @@ class WalletApplicationService:
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
 
-// DTOs
-export interface CreateWalletDTO {
-  userId: string;
-  organizationId: string;
-}
-
-export interface TransferFundsDTO {
-  fromWalletId: string;
-  toWalletId: string;
-  amount: number;
-  currencyCode: string;
-}
-
-export interface TopUpDTO {
-  walletId: string;
-  amount: number;
-  currencyCode: string;
-}
+// Importamos los DTOs desde otro módulo
+import { CreateWalletDTO, TransferFundsDTO, TopUpDTO } from './dtos';
 
 // Entidad y repositorio simplificados
 export class Wallet {
@@ -236,8 +212,41 @@ export class WalletApplicationService {
 
 ---
 
+## Diferencias entre Servicios de Aplicación y Servicios de Dominio
+
+| Aspecto | Servicios de Aplicación | Servicios de Dominio |
+|---------|------------------------|----------------------|
+| **Responsabilidad principal** | Orquestar casos de uso | Encapsular lógica de negocio |
+| **Conocimiento de infraestructura** | Sí (transacciones, seguridad) | No (independiente de infraestructura) |
+| **Usa DTOs** | Sí | No (trabaja con entidades de dominio) |
+| **Ubicación en arquitectura** | Entre interfaces externas y dominio | Dentro del dominio |
+| **Manejo de transacciones** | Sí | No |
+| **Ejemplos de operaciones** | Registrar usuario, crear pedido | Calcular precio, validar reglas complejas |
+
+---
+
+## Preguntas Frecuentes
+
+### ¿Por qué necesito un servicio de aplicación si ya tengo un servicio de dominio?
+Los servicios de aplicación y de dominio tienen responsabilidades distintas. El servicio de dominio se centra en la lógica de negocio pura, mientras que el servicio de aplicación se encarga de la orquestación, las transacciones y la comunicación con el mundo exterior. Usar ambos permite una mejor separación de responsabilidades.
+
+### ¿Cuándo debo usar DTOs y cuándo puedo usar directamente entidades de dominio?
+Para entender cuándo y cómo usar DTOs, consulta la [documentación dedicada a DTOs](data-transfer-objects.md).
+
+### ¿Puede un servicio de aplicación llamar a varios servicios de dominio?
+Sí, de hecho es común. Un servicio de aplicación puede coordinar varios servicios de dominio para completar un caso de uso complejo. Por ejemplo, un proceso de checkout podría involucrar servicios de dominio para inventario, pagos y envíos.
+
+### ¿Dónde debo colocar la validación de entradas?
+La validación básica (formato, tipos, etc.) debe hacerse en los DTOs. La validación de reglas de negocio debe hacerse en el dominio (entidades, agregados o servicios de dominio).
+
+### ¿Los servicios de aplicación pueden tener estado?
+No, los servicios de aplicación, al igual que los servicios de dominio, deben ser stateless (sin estado). Deben recibir toda la información necesaria como parámetros y no guardar estado entre llamadas.
+
+---
+
 ## Resumen
 
 - Los servicios de aplicación orquestan los casos de uso del dominio, validando y coordinando entidades y servicios de dominio.
+- Los DTOs facilitan la transferencia de datos entre el dominio y las interfaces externas, protegiendo el modelo de dominio.
 - El ejemplo de wallets muestra cómo implementar un caso de uso realista y relevante, tanto en Python como en TypeScript.
 - Mantén los servicios de aplicación delgados, enfocados en la orquestación y separados de la lógica de negocio pura. 

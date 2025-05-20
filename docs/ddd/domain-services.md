@@ -1,233 +1,77 @@
 # Servicios de Dominio
 
-Los servicios de dominio encapsulan la lógica de negocio que no pertenece naturalmente a entidades o objetos de valor específicos. Representan operaciones, procesos o transformaciones importantes en el dominio.
+Los servicios de dominio encapsulan la lógica de negocio que no pertenece naturalmente a entidades o objetos de valor específicos. Son ideales para operaciones que involucran múltiples entidades o agregados, como la transferencia de fondos entre wallets.
 
-## Propósito
+---
 
-Los servicios de dominio se utilizan cuando:
+## Problema Real: Transferencia de Fondos entre Wallets
 
-- Una operación involucra múltiples entidades o agregados.
-- Un proceso no es responsabilidad natural de una sola entidad.
-- Se necesita coordinar la interacción entre varios objetos de dominio.
+En una plataforma financiera, los usuarios pueden transferir fondos entre sus billeteras (wallets) en diferentes monedas. La transferencia debe cumplir reglas de negocio como:
+- Ambas wallets deben estar activas
+- Deben pertenecer a la misma organización
+- No se puede transferir más dinero del disponible
 
-## Características Principales
+El servicio de dominio se encarga de orquestar y validar estas reglas, manteniendo la lógica de negocio pura y reutilizable.
 
-- **Sin Estado**: Los servicios de dominio no mantienen estado.
-- **Orientados a Comportamiento**: Representan acciones, no cosas.
-- **Lenguaje Explícito**: Expresan directamente conceptos del dominio.
-- **Pureza del Dominio**: No contienen lógica técnica o de infraestructura.
+---
+
+## Cómo Leer el Diagrama
+
+El siguiente diagrama muestra el flujo de una transferencia de fondos:
+- Cada "participant" representa un actor o componente del sistema.
+- Las flechas (->>) indican el sentido de la comunicación o acción.
+- El flujo sigue el orden de arriba hacia abajo, mostrando cómo se valida y ejecuta la transferencia.
+
+## Diagrama de Flujo del Caso de Uso
+
+```mermaid
+sequenceDiagram
+    participant ServicioAplicacion
+    participant ServicioDominio
+    participant WalletRepository
+    participant WalletA
+    participant WalletB
+
+    ServicioAplicacion->>ServicioDominio: Solicita transferencia (A -> B)
+    ServicioDominio->>WalletRepository: Busca WalletA y WalletB
+    WalletRepository-->>ServicioDominio: Devuelve WalletA y WalletB
+    ServicioDominio->>WalletA: Valida y descuenta saldo
+    ServicioDominio->>WalletB: Agrega saldo
+    ServicioDominio->>WalletRepository: Guarda WalletA y WalletB
+    ServicioDominio-->>ServicioAplicacion: Confirma transferencia
+```
+
+---
 
 ## Implementación en Python
 
 ```python
-from typing import List, Optional
-from uuid import UUID
-from datetime import datetime
-
-from domain.order import Order, OrderStatus
-from domain.payment import Payment, PaymentMethod, PaymentStatus
-from domain.customer import Customer
-from domain.inventory import InventoryItem
-
-class OrderProcessingService:
-    """Servicio de dominio para procesar órdenes."""
-    
-    def __init__(
-        self, 
-        inventory_repository, 
-        payment_service, 
-        notification_service
-    ):
-        self.inventory_repository = inventory_repository
-        self.payment_service = payment_service
-        self.notification_service = notification_service
-    
-    def process_order(self, order: Order, payment_method: PaymentMethod) -> bool:
-        """
-        Procesa una orden completa, verificando inventario y realizando el pago.
-        Retorna True si la orden fue procesada exitosamente.
-        """
-        # Verificar disponibilidad de inventario
-        if not self._check_inventory_availability(order):
-            order.update_status(OrderStatus.REJECTED, "Inventario insuficiente")
-            return False
-            
-        # Procesar pago
-        payment_result = self._process_payment(order, payment_method)
-        if not payment_result.is_successful:
-            order.update_status(
-                OrderStatus.PAYMENT_FAILED, 
-                f"Fallo en el pago: {payment_result.error_message}"
-            )
-            return False
-            
-        # Reservar inventario
-        self._reserve_inventory(order)
-        
-        # Actualizar estado de la orden
-        order.update_status(OrderStatus.CONFIRMED)
-        order.set_payment_id(payment_result.payment_id)
-        
-        # Notificar al cliente
-        self._notify_customer(order)
-        
-        return True
-    
-    def _check_inventory_availability(self, order: Order) -> bool:
-        """Verifica si hay suficiente inventario para todos los items de la orden."""
-        for item in order.items:
-            inventory_item = self.inventory_repository.find_by_product_id(item.product_id)
-            if not inventory_item or inventory_item.available_quantity < item.quantity:
-                return False
-        return True
-    
-    def _process_payment(self, order: Order, payment_method: PaymentMethod) -> Payment:
-        """Procesa el pago de la orden utilizando el método de pago especificado."""
-        return self.payment_service.process_payment(
-            amount=order.total_amount,
-            currency=order.currency,
-            payment_method=payment_method,
-            order_reference=order.id
-        )
-    
-    def _reserve_inventory(self, order: Order) -> None:
-        """Reserva el inventario para los items de la orden."""
-        for item in order.items:
-            inventory_item = self.inventory_repository.find_by_product_id(item.product_id)
-            inventory_item.reserve(item.quantity)
-            self.inventory_repository.save(inventory_item)
-    
-    def _notify_customer(self, order: Order) -> None:
-        """Notifica al cliente sobre el estado de su orden."""
-        self.notification_service.send_order_confirmation(
-            customer_id=order.customer_id,
-            order_id=order.id,
-            total_amount=order.total_amount,
-            estimated_delivery=order.estimated_delivery_date
-        )
-```
-
-## Implementación en TypeScript
-
-```typescript
-import { Order, OrderStatus, OrderItem } from '../domain/order';
-import { Payment, PaymentMethod, PaymentResult } from '../domain/payment';
-import { InventoryRepository } from '../repositories/inventory-repository';
-import { PaymentService } from './payment-service';
-import { NotificationService } from './notification-service';
-
-export class OrderProcessingService {
-  constructor(
-    private readonly inventoryRepository: InventoryRepository,
-    private readonly paymentService: PaymentService,
-    private readonly notificationService: NotificationService
-  ) {}
-
-  async processOrder(order: Order, paymentMethod: PaymentMethod): Promise<boolean> {
-    // Verificar disponibilidad de inventario
-    const inventoryAvailable = await this.checkInventoryAvailability(order);
-    if (!inventoryAvailable) {
-      order.updateStatus(OrderStatus.REJECTED, "Inventario insuficiente");
-      return false;
-    }
-
-    // Procesar pago
-    const paymentResult = await this.processPayment(order, paymentMethod);
-    if (!paymentResult.isSuccessful) {
-      order.updateStatus(
-        OrderStatus.PAYMENT_FAILED,
-        `Fallo en el pago: ${paymentResult.errorMessage}`
-      );
-      return false;
-    }
-
-    // Reservar inventario
-    await this.reserveInventory(order);
-
-    // Actualizar estado de la orden
-    order.updateStatus(OrderStatus.CONFIRMED);
-    order.setPaymentId(paymentResult.paymentId);
-
-    // Notificar al cliente
-    await this.notifyCustomer(order);
-
-    return true;
-  }
-
-  private async checkInventoryAvailability(order: Order): Promise<boolean> {
-    for (const item of order.items) {
-      const inventoryItem = await this.inventoryRepository.findByProductId(item.productId);
-      if (!inventoryItem || inventoryItem.availableQuantity < item.quantity) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private async processPayment(order: Order, paymentMethod: PaymentMethod): Promise<PaymentResult> {
-    return this.paymentService.processPayment({
-      amount: order.totalAmount,
-      currency: order.currency,
-      paymentMethod,
-      orderReference: order.id
-    });
-  }
-
-  private async reserveInventory(order: Order): Promise<void> {
-    for (const item of order.items) {
-      const inventoryItem = await this.inventoryRepository.findByProductId(item.productId);
-      inventoryItem.reserve(item.quantity);
-      await this.inventoryRepository.save(inventoryItem);
-    }
-  }
-
-  private async notifyCustomer(order: Order): Promise<void> {
-    await this.notificationService.sendOrderConfirmation({
-      customerId: order.customerId,
-      orderId: order.id,
-      totalAmount: order.totalAmount,
-      estimatedDelivery: order.estimatedDeliveryDate
-    });
-  }
-}
-```
-
-## Tipos de Servicios de Dominio
-
-1. **Servicios de Transformación**: Transforman una entrada en una salida sin efectos secundarios (ej. cálculo de tarifas).
-2. **Servicios de Proceso**: Ejecutan un flujo de trabajo que involucra varios agregados (ej. procesamiento de órdenes).
-3. **Servicios de Coordinación**: Orquestan la interacción entre múltiples agregados (ej. transferencia entre cuentas).
-4. **Servicios de Validación**: Aplican reglas de negocio complejas que involucran múltiples entidades (ej. validación de límites de crédito).
-
-## Principios de Diseño
-
-1. **Enfoque en el Lenguaje Ubícuo**: Los nombres de servicios deben ser coherentes con el lenguaje del dominio.
-2. **Límites Contextuales**: Los servicios no deben atravesar contextos delimitados.
-3. **Inmutabilidad**: Implementar servicios como objetos inmutables cuando sea posible.
-4. **Evitar Servicios Anémicos**: Los servicios deben contener lógica de dominio significativa, no solo coordinar llamadas.
-
-## Mejores Prácticas
-
-1. **Conciso y Enfocado**: Cada servicio de dominio debe tener una responsabilidad clara y concisa.
-2. **Sin Estado**: Los servicios no deben almacenar estado entre llamadas.
-3. **Independencia de Infraestructura**: No mezclar lógica de dominio con preocupaciones de infraestructura.
-4. **Testabilidad**: Facilitar pruebas unitarias aislando la lógica de dominio.
-5. **Inyección de Dependencias**: Inyectar repositorios y otros servicios para facilitar pruebas y flexibilidad.
-
-# Servicios de Dominio: Ejemplo de Transferencia de Fondos
-
-Los **servicios de dominio** encapsulan lógica de negocio que involucra múltiples entidades o no pertenece naturalmente a una sola entidad.
-
-## ¿Cuándo usar un Servicio de Dominio?
-- Cuando una operación involucra varias entidades/agregados (por ejemplo, transferir fondos entre wallets)
-- Cuando la lógica no es responsabilidad natural de una sola entidad
-
-## Ejemplo: Servicio de Transferencia de Fondos
-
-```python
 from uuid import UUID
 from decimal import Decimal
-from .repositories import WalletRepository
+from typing import Dict
+
+class Wallet:
+    def __init__(self, id, organization_id, status='ACTIVE'):
+        self.id = id
+        self.organization_id = organization_id
+        self.status = status
+        self.balances: Dict[str, Decimal] = {}
+
+    def add_balance(self, currency_code, amount):
+        self.balances[currency_code] = self.balances.get(currency_code, Decimal('0')) + amount
+
+    def deduct_balance(self, currency_code, amount):
+        if self.balances.get(currency_code, Decimal('0')) < amount:
+            raise ValueError('Saldo insuficiente')
+        self.balances[currency_code] -= amount
+
+class WalletRepository:
+    def __init__(self):
+        self.wallets = {}
+    def save(self, wallet):
+        self.wallets[wallet.id] = wallet
+    def find_by_id(self, wallet_id):
+        return self.wallets.get(wallet_id)
 
 class TransferFundsService:
     def __init__(self, wallet_repository: WalletRepository):
@@ -237,14 +81,128 @@ class TransferFundsService:
         from_wallet = self.wallet_repository.find_by_id(from_wallet_id)
         to_wallet = self.wallet_repository.find_by_id(to_wallet_id)
         if not from_wallet or not to_wallet:
-            raise ValueError('Wallet not found')
+            raise ValueError('Wallet no encontrada')
+        if from_wallet.status != 'ACTIVE' or to_wallet.status != 'ACTIVE':
+            raise ValueError('Ambas wallets deben estar ACTIVAS')
         if from_wallet.organization_id != to_wallet.organization_id:
-            raise ValueError('Both wallets must belong to the same organization')
+            raise ValueError('Las wallets deben ser de la misma organización')
         from_wallet.deduct_balance(currency_code, amount)
         to_wallet.add_balance(currency_code, amount)
         self.wallet_repository.save(from_wallet)
         self.wallet_repository.save(to_wallet)
 ```
 
+---
+
+## Implementación en TypeScript
+
+```typescript
+// Entidad y repositorio simplificados
+export class Wallet {
+  id: string;
+  organizationId: string;
+  status: 'ACTIVE' | 'FROZEN' | 'CLOSED';
+  balances: Record<string, number>;
+
+  constructor(id: string, organizationId: string, status: 'ACTIVE' = 'ACTIVE') {
+    this.id = id;
+    this.organizationId = organizationId;
+    this.status = status;
+    this.balances = {};
+  }
+
+  addBalance(currencyCode: string, amount: number) {
+    this.balances[currencyCode] = (this.balances[currencyCode] || 0) + amount;
+  }
+
+  deductBalance(currencyCode: string, amount: number) {
+    if ((this.balances[currencyCode] || 0) < amount) {
+      throw new Error('Saldo insuficiente');
+    }
+    this.balances[currencyCode] -= amount;
+  }
+}
+
+export class WalletRepository {
+  private wallets: Record<string, Wallet> = {};
+  save(wallet: Wallet) {
+    this.wallets[wallet.id] = wallet;
+  }
+  findById(walletId: string): Wallet | undefined {
+    return this.wallets[walletId];
+  }
+}
+
+// Servicio de dominio
+export class TransferFundsService {
+  constructor(private walletRepository: WalletRepository) {}
+
+  transfer(fromWalletId: string, toWalletId: string, amount: number, currencyCode: string): void {
+    const fromWallet = this.walletRepository.findById(fromWalletId);
+    const toWallet = this.walletRepository.findById(toWalletId);
+    if (!fromWallet || !toWallet) {
+      throw new Error('Wallet no encontrada');
+    }
+    if (fromWallet.status !== 'ACTIVE' || toWallet.status !== 'ACTIVE') {
+      throw new Error('Ambas wallets deben estar ACTIVAS');
+    }
+    if (fromWallet.organizationId !== toWallet.organizationId) {
+      throw new Error('Las wallets deben ser de la misma organización');
+    }
+    fromWallet.deductBalance(currencyCode, amount);
+    toWallet.addBalance(currencyCode, amount);
+    this.walletRepository.save(fromWallet);
+    this.walletRepository.save(toWallet);
+  }
+}
+```
+
+---
+
+## Servicios de Dominio vs. Lógica en Entidades
+
+En DDD, siempre buscamos ubicar la lógica de negocio en el lugar más adecuado. La regla general es:
+
+1. **Lógica en entidades/agregados**: Cuando la operación involucra a una sola entidad o agregado
+2. **Lógica en servicios de dominio**: Cuando la operación:
+   - Involucra múltiples agregados
+   - No es responsabilidad natural de un agregado específico
+   - Representa una operación o algoritmo complejo del dominio
+
+---
+
+## Tipos de Servicios de Dominio
+
+Existen varios tipos de servicios de dominio según su propósito:
+
+1. **Servicios de operación**: Realizan operaciones sobre múltiples agregados (ej: transferencia de fondos)
+2. **Servicios de cálculo**: Implementan algoritmos complejos (ej: cálculo de rutas de envío)
+3. **Servicios de validación**: Verifican reglas de negocio complejas (ej: criterios de elegibilidad)
+4. **Servicios de transformación**: Convierten datos de un formato a otro dentro del dominio
+
+---
+
+## Preguntas Frecuentes
+
+### ¿Cómo decido si la lógica debe ir en una entidad o en un servicio de dominio?
+Si la lógica solo afecta a una entidad y sus objetos internos, debe ir en la entidad. Si involucra coordinar o validar múltiples agregados, o representa un proceso de negocio complejo, probablemente debería ir en un servicio de dominio.
+
+### ¿Los servicios de dominio pueden llamar a repositorios?
+Sí, es común que los servicios de dominio accedan a repositorios para obtener las entidades o agregados con los que necesitan trabajar. Sin embargo, no deben tener lógica de persistencia directa.
+
+### ¿Puedo tener servicios de dominio que dependen de otros servicios de dominio?
+Sí, es posible componer servicios de dominio para operaciones más complejas. Sin embargo, evita crear dependencias circulares y mantén clara la jerarquía de responsabilidades.
+
+### ¿Cuál es la diferencia entre un servicio de dominio y un servicio de infraestructura?
+Un servicio de dominio contiene lógica de negocio pura y es independiente de la infraestructura. Un servicio de infraestructura proporciona funcionalidades técnicas como envío de correos, integración con APIs externas, persistencia, etc.
+
+### ¿Los servicios de dominio deben ser stateless (sin estado)?
+Sí, los servicios de dominio deben ser stateless. Toda la información necesaria para ejecutar sus operaciones debe pasarse como parámetros, y cualquier estado debe almacenarse en las entidades o agregados.
+
+---
+
 ## Resumen
-Los servicios de dominio permiten mantener la lógica de negocio pura y centrada en el dominio, facilitando la reutilización y el testeo. 
+
+- Los servicios de dominio encapsulan lógica de negocio que involucra múltiples entidades o agregados.
+- El ejemplo de transferencia de fondos muestra cómo implementar un caso de uso realista y relevante, tanto en Python como en TypeScript.
+- Mantén los servicios de dominio enfocados en la lógica de negocio pura, separados de la infraestructura y fáciles de testear. 

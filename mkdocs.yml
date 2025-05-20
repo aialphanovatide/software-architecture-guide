@@ -116,18 +116,20 @@ nav:
   - Módulo 3 - DDD:
       - Diseño Dirigido por el Dominio:
           - Introducción a DDD: ddd/index.md
-          - Fundamentos para Principiantes:
+          - Modelado del Dominio:
               - Lenguaje Ubícuo: ddd/ubiquitous-language.md
               - Entidades y Objetos de Valor: ddd/entities-value-objects.md
               - Agregados: ddd/aggregates.md
+          - Persistencia y Servicios:
               - Repositorios: ddd/repositories.md
-          - Conceptos Intermedios:
               - Servicios de Dominio: ddd/domain-services.md
+          - Capas de Aplicación:
+              - Data Transfer Objects: ddd/data-transfer-objects.md
               - Servicios de Aplicación: ddd/application-services.md
-          - Conceptos Avanzados:
+          - Organización y Escalado:
               - Contextos Delimitados: ddd/bounded-contexts.md
               - Estructura de Código: ddd/code-structure.md
-          - Aplicación Práctica:
+          - Implementación Práctica:
               - Ejemplos Paso a Paso: ddd/examples.md
               - Guía de Implementación: team-adoption/ddd-implementation.md
   - Módulo 4 - Prácticas y Adopción:
