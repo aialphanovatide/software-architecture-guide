@@ -11,6 +11,52 @@ DDD cambia el enfoque de las preocupaciones técnicas al dominio de negocio:
 - El sistema se organiza alrededor de conceptos del dominio, no de capas técnicas
 - La lógica compleja del dominio se aísla para mantenerla pura y mantenible
 
+## Roles y Colaboración en DDD
+
+Un aspecto crucial de DDD es la colaboración constante entre dos grupos principales:
+
+### Expertos del Dominio
+
+Son quienes poseen el conocimiento profundo del negocio:
+
+- **Stakeholders de negocio**: Directivos, gerentes, responsables de producto
+- **Usuarios finales con experiencia**: Quienes utilizan los sistemas actuales
+- **Analistas de negocio**: Profesionales que entienden los procesos del negocio
+- **Product owners/managers**: Representantes del valor de negocio en el equipo
+
+Los expertos del dominio aportan:
+- Reglas y políticas del negocio
+- Conocimiento del contexto y las excepciones
+- Terminología específica del sector
+- Prioridades y casos de uso críticos
+
+### Equipo Técnico
+
+Son quienes construyen las soluciones:
+
+- **Desarrolladores**: Programadores, ingenieros de software
+- **Arquitectos**: Diseñadores de la estructura del sistema
+- **Testers**: Responsables de la calidad y validación
+- **DevOps/SRE**: Encargados de la infraestructura y operaciones
+
+El equipo técnico aporta:
+- Conocimiento sobre limitaciones tecnológicas
+- Opciones de implementación
+- Complejidad y costos técnicos
+- Patrones y prácticas de software
+
+### Colaboración Efectiva
+
+La clave del éxito en DDD es un diálogo continuo donde:
+
+1. **No hay barreras**: Los técnicos hablan directamente con los expertos, sin intermediarios
+2. **Aprendizaje mutuo**: Técnicos aprenden del dominio, expertos entienden las limitaciones técnicas
+3. **Lenguaje compartido**: Se desarrolla un lenguaje ubicuo que todos entienden
+4. **Modelado colaborativo**: Se construyen modelos juntos, no en silos separados
+5. **Refinamiento continuo**: El modelo evoluciona con la comprensión compartida
+
+Esta colaboración no es un evento puntual, sino un proceso continuo durante todo el desarrollo.
+
 ## Visión General de DDD
 
 El siguiente diagrama muestra cómo se relacionan los conceptos clave de DDD:

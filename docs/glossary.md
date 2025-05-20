@@ -112,6 +112,8 @@ Este glosario proporciona definiciones claras de términos clave utilizados en a
 
 **Reactive Programming**: Paradigma de programación orientado a flujos de datos asíncronos y propagación de cambios.
 
+**Raíz de Agregado (Aggregate Root)**: Entidad principal dentro de un agregado que sirve como único punto de entrada para cambios al agregado, manteniendo sus invariantes.
+
 ## S
 
 **Saga Pattern**: Patrón para gestionar transacciones distribuidas en arquitecturas de microservicios.

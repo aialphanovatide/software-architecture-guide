@@ -4,19 +4,11 @@ En el Diseño Dirigido por el Dominio (DDD), los **agregados** ayudan a mantener
 
 ---
 
-## Glosario de Términos
-
-| Término         | Definición                                                                 |
-|-----------------|----------------------------------------------------------------------------|
-| Agregado        | Grupo de entidades y objetos de valor que deben mantenerse consistentes     |
-| Raíz de Agregado| Entidad principal que controla el acceso y las modificaciones al agregado   |
-| Invariante      | Regla de negocio que siempre debe cumplirse dentro del agregado             |
-
 ---
 
 ## ¿Qué es un Agregado?
 
-Un **agregado** es como una "caja fuerte" que agrupa entidades y objetos de valor relacionados. Solo se puede modificar su contenido a través de una única puerta: la **raíz del agregado**. Así, garantizamos que las reglas de negocio (invariantes) nunca se rompan.
+Un **agregado** (@glossary.md) es como una "caja fuerte" que agrupa entidades y objetos de valor relacionados. Solo se puede modificar su contenido a través de una única puerta: la **raíz del agregado** (@glossary.md). Así, garantizamos que las reglas de negocio (**invariantes** @glossary.md) nunca se rompan.
 
 - **¿Por qué usar agregados?**
   - Mantienen la consistencia de los datos

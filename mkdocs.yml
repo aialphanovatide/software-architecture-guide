@@ -117,19 +117,24 @@ nav:
       - Diseño Dirigido por el Dominio:
           - Introducción a DDD: ddd/index.md
           - Modelado del Dominio:
+              - Introducción: ddd/modelado-del-dominio/index.md
               - Lenguaje Ubícuo: ddd/modelado-del-dominio/ubiquitous-language.md
               - Entidades y Objetos de Valor: ddd/modelado-del-dominio/entities-value-objects.md
               - Agregados: ddd/modelado-del-dominio/aggregates.md
           - Persistencia y Servicios:
+              - Introducción: ddd/persistencia-y-servicios/index.md
               - Repositorios: ddd/persistencia-y-servicios/repositories.md
               - Servicios de Dominio: ddd/persistencia-y-servicios/domain-services.md
           - Capas de Aplicación:
+              - Introducción: ddd/capas-de-aplicacion/index.md
               - Data Transfer Objects: ddd/capas-de-aplicacion/data-transfer-objects.md
               - Servicios de Aplicación: ddd/capas-de-aplicacion/application-services.md
           - Organización y Escalado:
+              - Introducción: ddd/organizacion-y-escalado/index.md
               - Contextos Delimitados: ddd/organizacion-y-escalado/bounded-contexts.md
               - Estructura de Código: ddd/organizacion-y-escalado/code-structure.md
           - Implementación Práctica:
+              - Introducción: ddd/implementacion-practica/index.md
               - Ejemplos Paso a Paso: ddd/implementacion-practica/examples.md
               - Guía de Implementación: team-adoption/ddd-implementation.md
   - Módulo 4 - Prácticas y Adopción:
