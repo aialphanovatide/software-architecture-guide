@@ -350,4 +350,70 @@ export class CustomerApplicationService {
 3. **Límites Claros**: Establecer límites claros entre infraestructura, aplicación y dominio.
 4. **Manejo de Errores**: Implementar estrategias consistentes de manejo de errores y excepciones.
 5. **Inyección de Dependencias**: Utilizar inyección para servicios y repositorios de dominio.
-6. **Validación Temprana**: Validar entradas antes de invocar lógica de dominio para evitar corrupciones. 
+6. **Validación Temprana**: Validar entradas antes de invocar lógica de dominio para evitar corrupciones.
+
+# Servicios de Aplicación: Ejemplo de Wallets
+
+Los **servicios de aplicación** orquestan casos de uso, coordinando entidades, servicios de dominio y repositorios. No contienen lógica de negocio compleja, sino que gestionan flujos y validaciones de alto nivel.
+
+## DTOs para Wallets
+
+```python
+from pydantic import BaseModel
+from uuid import UUID
+from decimal import Decimal
+
+class CreateWalletDTO(BaseModel):
+    user_id: UUID
+    organization_id: UUID
+
+class TransferFundsDTO(BaseModel):
+    from_wallet_id: UUID
+    to_wallet_id: UUID
+    amount: Decimal
+    currency_code: str
+
+class TopUpDTO(BaseModel):
+    wallet_id: UUID
+    amount: Decimal
+    currency_code: str
+```
+
+## Servicio de Aplicación para Wallets
+
+```python
+class WalletApplicationService:
+    def __init__(self, wallet_repository, transfer_service):
+        self.wallet_repository = wallet_repository
+        self.transfer_service = transfer_service
+
+    def create_wallet(self, dto: CreateWalletDTO):
+        # Validar que el usuario pertenece a la organización
+        wallet = Wallet(
+            id=uuid4(),
+            user_id=dto.user_id,
+            organization_id=dto.organization_id,
+            status='ACTIVE',
+            balances={}
+        )
+        self.wallet_repository.save(wallet)
+        return wallet
+
+    def transfer_funds(self, dto: TransferFundsDTO):
+        self.transfer_service.transfer(
+            dto.from_wallet_id,
+            dto.to_wallet_id,
+            dto.amount,
+            dto.currency_code
+        )
+
+    def top_up_wallet(self, dto: TopUpDTO):
+        wallet = self.wallet_repository.find_by_id(dto.wallet_id)
+        if not wallet:
+            raise ValueError('Wallet not found')
+        wallet.add_balance(dto.currency_code, dto.amount)
+        self.wallet_repository.save(wallet)
+```
+
+## Resumen
+Los servicios de aplicación coordinan los casos de uso del dominio, asegurando validaciones y orquestando la lógica de negocio sin mezclar detalles de infraestructura. 

@@ -212,4 +212,39 @@ export class OrderProcessingService {
 2. **Sin Estado**: Los servicios no deben almacenar estado entre llamadas.
 3. **Independencia de Infraestructura**: No mezclar lógica de dominio con preocupaciones de infraestructura.
 4. **Testabilidad**: Facilitar pruebas unitarias aislando la lógica de dominio.
-5. **Inyección de Dependencias**: Inyectar repositorios y otros servicios para facilitar pruebas y flexibilidad. 
+5. **Inyección de Dependencias**: Inyectar repositorios y otros servicios para facilitar pruebas y flexibilidad.
+
+# Servicios de Dominio: Ejemplo de Transferencia de Fondos
+
+Los **servicios de dominio** encapsulan lógica de negocio que involucra múltiples entidades o no pertenece naturalmente a una sola entidad.
+
+## ¿Cuándo usar un Servicio de Dominio?
+- Cuando una operación involucra varias entidades/agregados (por ejemplo, transferir fondos entre wallets)
+- Cuando la lógica no es responsabilidad natural de una sola entidad
+
+## Ejemplo: Servicio de Transferencia de Fondos
+
+```python
+from uuid import UUID
+from decimal import Decimal
+from .repositories import WalletRepository
+
+class TransferFundsService:
+    def __init__(self, wallet_repository: WalletRepository):
+        self.wallet_repository = wallet_repository
+
+    def transfer(self, from_wallet_id: UUID, to_wallet_id: UUID, amount: Decimal, currency_code: str):
+        from_wallet = self.wallet_repository.find_by_id(from_wallet_id)
+        to_wallet = self.wallet_repository.find_by_id(to_wallet_id)
+        if not from_wallet or not to_wallet:
+            raise ValueError('Wallet not found')
+        if from_wallet.organization_id != to_wallet.organization_id:
+            raise ValueError('Both wallets must belong to the same organization')
+        from_wallet.deduct_balance(currency_code, amount)
+        to_wallet.add_balance(currency_code, amount)
+        self.wallet_repository.save(from_wallet)
+        self.wallet_repository.save(to_wallet)
+```
+
+## Resumen
+Los servicios de dominio permiten mantener la lógica de negocio pura y centrada en el dominio, facilitando la reutilización y el testeo. 

@@ -381,4 +381,63 @@ async function transferMoney(fromId: string, toId: string, amount: number): Prom
 
 - **Caching**: Implementar estrategias de caché para repositorios de acceso frecuente.
 - **Carga diferida vs. Carga ansiosa**: Elegir estrategias apropiadas según el contexto de uso.
-- **Optimización de consultas**: Asegurar que las consultas a la base de datos estén optimizadas. 
+- **Optimización de consultas**: Asegurar que las consultas a la base de datos estén optimizadas.
+
+# Repositorios: Ejemplo de WalletRepository
+
+Los **repositorios** abstraen el acceso a los agregados, permitiendo recuperar y persistir entidades del dominio sin exponer detalles de infraestructura.
+
+## Interfaz de WalletRepository
+
+```python
+from abc import ABC, abstractmethod
+from typing import Optional
+from uuid import UUID
+from .entities import Wallet
+
+class WalletRepository(ABC):
+    @abstractmethod
+    def find_by_id(self, wallet_id: UUID) -> Optional[Wallet]:
+        pass
+
+    @abstractmethod
+    def save(self, wallet: Wallet) -> None:
+        pass
+```
+
+## Implementación Básica (ejemplo con SQLAlchemy)
+
+```python
+class SqlAlchemyWalletRepository(WalletRepository):
+    def __init__(self, session):
+        self.session = session
+
+    def find_by_id(self, wallet_id: UUID) -> Optional[Wallet]:
+        # Buscar en la base de datos y mapear a entidad Wallet
+        ...
+
+    def save(self, wallet: Wallet) -> None:
+        # Insertar o actualizar la wallet en la base de datos
+        ...
+```
+
+## Uso con Unit of Work
+
+El patrón Unit of Work coordina transacciones entre múltiples repositorios:
+
+```python
+def transfer_funds(from_wallet_id, to_wallet_id, amount, currency_code, uow_factory):
+    with uow_factory() as uow:
+        from_wallet = uow.wallets.find_by_id(from_wallet_id)
+        to_wallet = uow.wallets.find_by_id(to_wallet_id)
+        from_wallet.transfer(to_wallet, amount, currency_code)
+        uow.wallets.save(from_wallet)
+        uow.wallets.save(to_wallet)
+        uow.commit()
+```
+
+## Mejores Prácticas
+- Un repositorio por agregado
+- No exponer detalles de infraestructura
+- Devolver entidades completas
+- Integrar con Unit of Work para consistencia transaccional 
