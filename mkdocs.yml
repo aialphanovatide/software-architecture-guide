@@ -113,6 +113,9 @@ nav:
           - Patrones de Comunicación: architecture/microservices/communication.md
           - Estrategias de Despliegue: architecture/microservices/deployment.md
           - Estructura de Código: architecture/microservices/code-structure.md
+          - Ejemplo de Implementación: architecture/microservices/example-implementation.md
+          - Patrones de Resiliencia:
+              - Circuit Breaker: architecture/microservices/resilience-patterns/circuit-breaker.md
   - Módulo 3 - DDD:
       - Diseño Dirigido por el Dominio:
           - Introducción a DDD: ddd/index.md
