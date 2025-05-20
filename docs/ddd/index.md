@@ -184,13 +184,13 @@ Al mismo tiempo, mantiene la clara separación de responsabilidades entre las di
 
 DDD abarca varios conceptos clave que se exploran en detalle:
 
-1. [**Lenguaje Ubicuo**](ubiquitous-language.md) - Un lenguaje compartido entre desarrolladores y expertos del dominio
-2. [**Contextos Delimitados**](bounded-contexts.md) - Límites explícitos donde se aplican los modelos
-3. [**Entidades y Objetos de Valor**](entities-value-objects.md) - Los bloques de construcción de los modelos de dominio
-4. [**Agregados**](aggregates.md) - Grupos de entidades relacionadas con límites claros
-5. [**Repositorios**](repositories.md) - Métodos para recuperar y persistir objetos del dominio, incluyendo el patrón Unit of Work
-6. [**Servicios de Dominio**](domain-services.md) - Operaciones que no pertenecen naturalmente a las entidades
-7. [**Servicios de Aplicación**](application-services.md) - Orquestación de objetos de dominio para realizar casos de uso
+1. [**Lenguaje Ubicuo**](modelado-del-dominio/ubiquitous-language.md) - Un lenguaje compartido entre desarrolladores y expertos del dominio
+2. [**Contextos Delimitados**](organizacion-y-escalado/bounded-contexts.md) - Límites explícitos donde se aplican los modelos
+3. [**Entidades y Objetos de Valor**](modelado-del-dominio/entities-value-objects.md) - Los bloques de construcción de los modelos de dominio
+4. [**Agregados**](modelado-del-dominio/aggregates.md) - Grupos de entidades relacionadas con límites claros
+5. [**Repositorios**](persistencia-y-servicios/repositories.md) - Métodos para recuperar y persistir objetos del dominio, incluyendo el patrón Unit of Work
+6. [**Servicios de Dominio**](persistencia-y-servicios/domain-services.md) - Operaciones que no pertenecen naturalmente a las entidades
+7. [**Servicios de Aplicación**](capas-de-aplicacion/application-services.md) - Orquestación de objetos de dominio para realizar casos de uso
 
 ## DDD y Arquitectura
 

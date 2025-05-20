@@ -117,20 +117,20 @@ nav:
       - Diseño Dirigido por el Dominio:
           - Introducción a DDD: ddd/index.md
           - Modelado del Dominio:
-              - Lenguaje Ubícuo: ddd/ubiquitous-language.md
-              - Entidades y Objetos de Valor: ddd/entities-value-objects.md
-              - Agregados: ddd/aggregates.md
+              - Lenguaje Ubícuo: ddd/modelado-del-dominio/ubiquitous-language.md
+              - Entidades y Objetos de Valor: ddd/modelado-del-dominio/entities-value-objects.md
+              - Agregados: ddd/modelado-del-dominio/aggregates.md
           - Persistencia y Servicios:
-              - Repositorios: ddd/repositories.md
-              - Servicios de Dominio: ddd/domain-services.md
+              - Repositorios: ddd/persistencia-y-servicios/repositories.md
+              - Servicios de Dominio: ddd/persistencia-y-servicios/domain-services.md
           - Capas de Aplicación:
-              - Data Transfer Objects: ddd/data-transfer-objects.md
-              - Servicios de Aplicación: ddd/application-services.md
+              - Data Transfer Objects: ddd/capas-de-aplicacion/data-transfer-objects.md
+              - Servicios de Aplicación: ddd/capas-de-aplicacion/application-services.md
           - Organización y Escalado:
-              - Contextos Delimitados: ddd/bounded-contexts.md
-              - Estructura de Código: ddd/code-structure.md
+              - Contextos Delimitados: ddd/organizacion-y-escalado/bounded-contexts.md
+              - Estructura de Código: ddd/organizacion-y-escalado/code-structure.md
           - Implementación Práctica:
-              - Ejemplos Paso a Paso: ddd/examples.md
+              - Ejemplos Paso a Paso: ddd/implementacion-practica/examples.md
               - Guía de Implementación: team-adoption/ddd-implementation.md
   - Módulo 4 - Prácticas y Adopción:
       - Mejores Prácticas:
