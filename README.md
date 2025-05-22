@@ -19,6 +19,7 @@ La guía se centra en:
 - Python 3.8+
 - Docker y Docker Compose (opcional)
 - Make (opcional, para usar el Makefile)
+- Token de Ngrok (opcional, para exponer el servicio a internet)
 
 ### Usando el Makefile
 
@@ -28,14 +29,13 @@ El proyecto incluye un Makefile para mayor comodidad:
 # Mostrar todos los comandos disponibles
 make help
 
-# Desarrollo local
-make setup    # Instalar dependencias
-make run      # Ejecutar servidor de desarrollo local
-
 # Operaciones de Docker
-make start-docker    # Construir e iniciar en Docker
-make docker-logs     # Ver logs
-make docker-down     # Detener el contenedor Docker
+make build         # Construir la imagen Docker
+make up            # Iniciar los servicios (docs y ngrok)
+make down          # Detener los servicios
+make logs          # Ver logs de los servicios
+make start         # Construir e iniciar en Docker (combinado)
+make restart       # Reiniciar los servicios
 ```
 
 ### Desarrollo Local
@@ -50,31 +50,36 @@ make docker-down     # Detener el contenedor Docker
    ```
    pip install -r requirements.txt
    ```
-   O usar: `make setup`
 
 3. Iniciar el servidor de desarrollo:
    ```
    mkdocs serve
    ```
-   O usar: `make run`
 
 4. Ver la documentación en `http://localhost:8000`
 
 ### Usando Docker Compose
 
-1. Iniciar el servicio:
+1. Si deseas utilizar ngrok para exponer el servicio, configura tu token de autenticación:
+   ```
+   export NGROK_AUTHTOKEN=tu_token_de_ngrok
+   ```
+
+2. Iniciar los servicios:
    ```
    docker-compose up -d
    ```
-   O usar: `make docker-up`
+   O usar: `make up`
 
-2. Ver la documentación en `http://localhost:8000`
+3. Ver la documentación en `http://localhost:8000`
 
-3. Detener el servicio:
+4. Si estás utilizando ngrok, puedes acceder a la interfaz web en `http://localhost:4040` para obtener la URL pública
+
+5. Detener los servicios:
    ```
    docker-compose down
    ```
-   O usar: `make docker-down`
+   O usar: `make down`
 
 ### Usando Docker (Método Legado)
 
@@ -97,7 +102,6 @@ Para construir archivos HTML estáticos:
 ```
 mkdocs build
 ```
-O usar: `make build`
 
 El sitio construido estará en el directorio `site`.
 
@@ -115,22 +119,25 @@ Agradecemos las contribuciones a esta guía. Para contribuir:
 ```
 software-architecture-guide/
 ├── docs/                    # Contenido de la documentación
-│   └── es/                  # Contenido en español
-│       ├── index.md         # Página de inicio
-│       ├── solid/           # Principios SOLID
-│       ├── design-patterns/ # Patrones de diseño
-│       ├── architecture/    # Estilos arquitectónicos
-│       ├── ddd/             # Diseño Dirigido por el Dominio
-│       ├── examples/        # Ejemplos de implementación
-│       ├── best-practices/  # Mejores prácticas
-│       └── team-adoption/   # Estrategias de adopción en equipo
+│   ├── index.md             # Página de inicio
+│   ├── glossary.md          # Glosario de términos
+│   ├── architecture/        # Estilos arquitectónicos
+│   │   ├── microservices/   # Microservicios
+│   │   │   ├── resilience-patterns/ # Patrones de resiliencia
+│   │   │   ├── principles.md
+│   │   │   ├── deployment.md
+│   │   │   ├── communication.md
+│   │   │   ├── code-structure.md
+│   │   │   └── example-implementation.md
+│   ├── ddd/                 # Diseño Dirigido por el Dominio
+│   ├── design-patterns/     # Patrones de diseño
+│   ├── solid/               # Principios SOLID
+│   ├── best-practices/      # Mejores prácticas
+│   └── team-adoption/       # Estrategias de adopción en equipo
 ├── mkdocs.yml               # Configuración de MkDocs
-├── docker-compose.yml       # Configuración de Docker Compose
+├── docker-compose.yml       # Configuración de Docker Compose (incluye servicios docs y ngrok)
 ├── Makefile                 # Comandos de automatización
 ├── requirements.txt         # Dependencias de Python
 └── dockerfile               # Configuración de Docker
 ```
 
-## Licencia
-
-[Tu Licencia] 

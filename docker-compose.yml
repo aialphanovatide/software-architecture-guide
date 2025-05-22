@@ -12,3 +12,13 @@ services:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
     command: ["mkdocs", "serve", "--dev-addr=0.0.0.0:8000", "--livereload"] 
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: http docs:8000
+    depends_on:
+      - docs 

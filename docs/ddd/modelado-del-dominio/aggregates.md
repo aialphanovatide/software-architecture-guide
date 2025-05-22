@@ -8,7 +8,7 @@ En el Diseño Dirigido por el Dominio (DDD), los **agregados** ayudan a mantener
 
 ## ¿Qué es un Agregado?
 
-Un **agregado** (@glossary.md) es como una "caja fuerte" que agrupa entidades y objetos de valor relacionados. Solo se puede modificar su contenido a través de una única puerta: la **raíz del agregado** (@glossary.md). Así, garantizamos que las reglas de negocio (**invariantes** @glossary.md) nunca se rompan.
+Un **agregado** es como una "caja fuerte" que agrupa entidades y objetos de valor relacionados. Solo se puede modificar su contenido a través de una única puerta: la **raíz del agregado** (ver [Glosario](../../glossary.md)). Así, garantizamos que las reglas de negocio (**invariantes** ver [Glosario](../../glossary.md)) nunca se rompan.
 
 - **¿Por qué usar agregados?**
   - Mantienen la consistencia de los datos
